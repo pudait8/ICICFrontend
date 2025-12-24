@@ -1,0 +1,61 @@
+{
+    "header": {
+        "org": {
+            "namePart1": {
+                "en": "PUNJAB URBAN PLANNING",
+                "pa": "ਪੰਜਾਬ ਸ਼ਹਿਰੀ ਯੋਜਨਾ"
+            },
+            "namePart2": {
+                "en": "& DEVELOPMENT AUTHORITY",
+                "pa": "ਅਤੇ ਵਿਕਾਸ ਅਥਾਰਟੀ"
+            }
+        },
+        "menu": {
+            "login": {
+                "en": "Login",
+                "hi": "लॉग इन",
+                "pa": "ਲਾਗਿਨ"
+            },
+            "contactUs": {
+                "en": "Contact Us",
+                "hi": "संपर्क करें",
+                "pa": "ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ"
+            },
+            "citizenServices": {
+                "en": "Citizen Services",
+                "hi": "नागरिक सेवा",
+                "pa": "ਸਿਟੀਜਨ ਸਰਵਿਸਿਜ਼"
+            },
+            "userManual": {
+                "en": "User Manual",
+                "hi": "User Manual",
+                "pa": "ਯੂਜ਼ਰ ਮੈਨੂਅਲ"
+            },
+            "faq": {
+                "en": "Faq",
+                "hi": "सामान्य प्रश्न",
+                "pa": "ਅਕਸਰ ਪੁੱਛੇ ਜਾਂਦੇ ਪ੍ਰਸ਼ਨ"
+            }
+        },
+        "citizenServicesTabs": {
+            "services": {
+                "en": "Services",
+                "pa": "ਸੇਵਾਵਾਂ"
+            },
+            "grievances": {
+                "en": "Grievances",
+                "pa": "ਸ਼ਿਕਾਇਤਾਂ"
+            },
+            "rti": {
+                "en": "RTI Request/Status",
+                "pa": "ਆਰ.ਟੀ.ਆਈ. ਬੇਨਤੀ/ ਸਥਿਤੀ"
+            }
+        }
+    },
+    "serviceList": {
+        "title": {
+            "en": "WELCOME TO CITIZEN PORTAL",
+            "pa": "ਸਿਟੀਜ਼ਨ ਪੋਰਟਲ ਤੇ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ"
+        }
+    }
+}

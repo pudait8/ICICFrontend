@@ -1,0 +1,35 @@
+.get-upn-from-container {
+    max-width: 600px;
+    margin: auto;
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+    padding: 0 1.5rem;
+}
+
+.get-upn-from-container .heading {
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 2rem;
+}
+
+.GetUpn_successState {
+    display: flex;
+    flex-flow: column;
+    padding-top: 3rem;
+    align-items: center;
+}
+
+.GetUpn_successState .building-img {
+    width: 15rem;
+}    
+
+.GetUpn_successState .title {
+    font-size: 14px;
+    font-family: Helvetica;
+    font-weight: bold;
+}
+
+.GetUpn_successState .description {
+    font-size: 12px;
+    font-family: Helvetica;
+}

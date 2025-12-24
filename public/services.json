@@ -1,0 +1,117 @@
+[
+    {
+        "icon": "FileIcon",
+        "title": "Transfer Permission",
+        "description": "On the basis of registered or unregistered will"
+    },
+    {
+        "icon": "ContractIcon",
+        "title": "Mortgage Permission",
+        "description": "Application for permission to mortgage"
+    },
+    {
+        "icon": "OwnerIcon",
+        "title": "Change of Ownership",
+        "description": "In case of death or otherwise With registered/unregistered will"
+    },
+    {
+        "icon": "PageIcon",
+        "title": "Demarcation of Plot",
+        "description": "In case of death or otherwise With registered/unregistered will"
+    },
+    {
+        "icon": "MortgageIcon",
+        "title": "Lease Deed",
+        "description": "On the basis of registered or unregistered will"
+    },
+    {
+        "icon": "EnvelopeIcon",
+        "title": "Re-allotment Letter",
+        "description": "Application for permission to mortgage"
+    },
+    {
+        "icon": "CertificateIcon",
+        "title": "No Due Certificate",
+        "description": "On the basis of registered or unregistered will"
+    },
+    {
+        "icon": "CertificateIcon",
+        "title": "DPC Certificate",
+        "description": "Application for permission to mortgage"
+    },
+    {
+        "icon": "OwnerIcon",
+        "title": "CD Issuance",
+        "description": "On the basis of registered or unregistered will"
+    },
+    {
+        "icon": "ContractIcon",
+        "title": "Documents Copy",
+        "description": "Application for permission to mortgage"
+    },
+    {
+        "icon": "FillOutlineIcon",
+        "title": "Sanction of Building Plans",
+        "description": "On the basis of registered or unregistered will"
+    },
+    {
+        "icon": "FilledOutlineIcon",
+        "title": "Sanction of Water Supply",
+        "description": "Application for permission to mortgage"
+    },
+    {
+        "icon": "WaterIcon",
+        "title": "Sanction of Sewerage Connection",
+        "description": "On the basis of registered or unregistered will"
+    },
+    {
+        "icon": "PageIcon",
+        "title": "Plinth Level",
+        "description": "Application for permission to mortgage"
+    },
+    {
+        "icon": "FileSingleIcon",
+        "title": "Completion/Occupation Cert.",
+        "description": "On the basis of registered or unregistered will"
+    },
+    {
+        "icon": "FileIcon",
+        "title": "Permission to sell/gift/transfer",
+        "description": "Application for permission to mortgage"
+    },
+    {
+        "icon": "EnvelopeIcon",
+        "title": "Allotment Letter",
+        "description": "On the basis of registered or unregistered will"
+    },
+    {
+        "icon": "AgentIcon",
+        "title": "Real Estate Registration",
+        "description": "Application for permission to mortgage"
+    },
+    {
+        "icon": "OnlineRegistrationIcon",
+        "title": "Promoter Registration",
+        "description": "On the basis of registered or unregistered will"
+    },
+    {
+        "icon": "FileIcon",
+        "title": "Transfer Permissions",
+        "description": "Application for permission to mortgage"
+    },
+    {
+        "icon": "EnvelopeIcon",
+        "title": "Transfer of Allotment Letter",
+        "description": "On the basis of registered or unregistered will"
+    },
+    {
+        "icon": "FileIcon",
+        "title": "Transfer of Plot/House/Site",
+        "description": "Application for permission to mortgage"
+    },
+    {
+        "icon": "ContractIcon",
+        "title": "Transfer Letter of Intent",
+        "description": "On the basis of registered or unregistered will"
+    }
+]
