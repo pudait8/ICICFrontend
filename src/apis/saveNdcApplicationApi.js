@@ -17,6 +17,7 @@ const saveNdcApplicationApi = async (params) => {
                 "IdType": 0,
                 "IdDetail": "",
                 "ApplicationDetail": params.Remark,
+                "ApplicationId":params.ApplicationId,
                 "GPASPA": params.GPASPA,
                 "GstNo": "",
                 "TemporaryApplicationId": params.TemporaryApplicationId,

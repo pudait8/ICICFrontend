@@ -275,7 +275,38 @@ const NdcFormReadOnly = (props) => {
                   <Input size="large" readOnly />
                 </FormItem>
               </Col>
+              </Row>
+                {/* <Heading>Details of Built Up Area</Heading>
+              <Row>
+               {serviceId === "1791" && (<>
+                           <Col span="8">
+                              <FormItem label="Covered Area (In Sq.Mtrs.)" name="CoveredArea">
+                              <Input size="large" readOnly />
+                            </FormItem>
+                          </Col>
+                         
+                            
+                           
+                           </>)}
             </Row>
+             <Heading>Details of Boundary Wall</Heading>
+                            <Row>   
+                                <Col span="8">
+                              <FormItem label="Boundary Wall" name="BoundaryWall">
+                              <Input size="large" readOnly />
+                            </FormItem>
+                          </Col> 
+                              </Row>
+            
+                               <Heading>Details of F.A.R</Heading>
+                            <Row>    
+                               <Col span="8">
+                              <FormItem label="F.A.R (in Sq.mtrs.)" name="F.A.R">
+                             <Input size="large" readOnly />
+                            </FormItem>
+                          </Col>
+                              </Row> */}
+            
             {serviceId === "33" && (
               <>
                 <Heading>

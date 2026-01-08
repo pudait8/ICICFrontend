@@ -48,6 +48,8 @@ import rescheduleAppointmentByCitizenSaga from './sagas/rescheduleAppointmentByC
 import getAppointmentHistorySaga from './sagas/getAppointmentHistorySaga'
 import getPropertyDetailByNocNumberSaga from './sagas/getPropertyDetailByNocNumberSaga'
 import saveChangeOfOwnershipApplicationSaga from './sagas/saveChangeOfOwnershipApplicationSaga'
+import saveApplicationAsDraftSaga from './sagas/saveApplicationAsDraftSaga'
+import getDraftApplicationDetailsSaga from './sagas/getDraftApplicationDetailsSaga'
 import getNocByUpnSaga from './sagas/getNocByUpnSaga'
 import saveEditApplicationSaga from './sagas/saveEditApplicationSaga'
 import viewEditApplicationSaga from './sagas/viewEditApplicationSaga'
@@ -163,6 +165,8 @@ sagaMiddleware.run(rescheduleAppointmentByCitizenSaga)
 sagaMiddleware.run(getAppointmentHistorySaga)
 sagaMiddleware.run(getPropertyDetailByNocNumberSaga)
 sagaMiddleware.run(saveChangeOfOwnershipApplicationSaga)
+sagaMiddleware.run(saveApplicationAsDraftSaga)
+sagaMiddleware.run(getDraftApplicationDetailsSaga)
 sagaMiddleware.run(getNocByUpnSaga)
 sagaMiddleware.run(saveEditApplicationSaga)
 sagaMiddleware.run(viewEditApplicationSaga)

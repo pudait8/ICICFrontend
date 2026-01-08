@@ -35,8 +35,21 @@ const PrintAcknowledgement = props => {
 
     return (
         <>
-            {getApplicationDetailState.uiState === "ideal" &&
-                <div align="left" style={{ width: '100%', margin: "15px" }}>
+            {getApplicationDetailState.uiState === "ideal" && (
+    getApplicationDetailState.data.ApplicationTypeId === 1791 //change in prod
+        ? <BPPrintLayout data={getApplicationDetailState.data} />
+        : <DefaultAcknowledgement {...props} />
+)}
+
+        </>
+    )
+}
+
+const DefaultAcknowledgement = (props) => {
+   const { getApplicationDetailState } = props
+   return (
+      <>
+          <div align="left" style={{ width: '100%', margin: "15px" }}>
                     <table cellSpacing={1} cellPadding={2} style={{ textAlign: 'left', width: '350px', height: '335px', verticalAlign: 'top' }} width="100%" border={0}>
                         <tbody>
                             <tr>
@@ -212,10 +225,200 @@ const PrintAcknowledgement = props => {
                         </tbody>
                     </table>
                 </div>
-            }
-        </>
+      </>
+   )
+}
+
+const BPPrintLayout = ({ data }) => {
+
+    const styles = {
+        page: {
+            width: "800px",
+            margin: "0 auto",
+            fontFamily: "Arial, Helvetica, sans-serif",
+            fontSize: "12px",
+            color: "#000"
+        },
+        headerBar: {
+            background: "#2f96b4",
+            color: "#000",
+            padding: "12px",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: "16px",
+            position: "relative"
+        },
+        subHeader: {
+            textAlign: "center",
+            fontWeight: "bold",
+            margin: "15px 0",
+            fontSize: "14px"
+        },
+        table: {
+            width: "100%",
+            borderCollapse: "collapse"
+        },
+        td: {
+            padding: "6px",
+            verticalAlign: "top"
+        },
+        label: {
+            fontWeight: "bold",
+            whiteSpace: "nowrap"
+        },
+        section: {
+            background: "#d3d3d3",
+            fontWeight: "bold",
+            padding: "6px"
+        },
+        checklist: {
+            paddingLeft: "20px",
+            lineHeight: "18px"
+        },
+        note: {
+            marginTop: "15px",
+            fontSize: "11px",
+            fontWeight: "bold"
+        }
+    }
+
+    return (
+        // <div style={styles.page}>
+<div
+  style={{
+    ...styles.page,
+    backgroundColor: "#fff",
+    padding: "20px",
+    minHeight: "100vh"
+  }}
+>
+            {/* HEADER */}
+            <div style={styles.headerBar}>
+                {data.PropertyDetails.AuthorityName}<br />
+                <span style={{ fontSize: "14px" }}>ਗਰੇਟਰ ਮੋਹਾਲੀ ਏਰੀਆ ਡਿਵੈਲਪਮੈਂਟ ਅਥਾਰਿਟੀ</span>
+            </div>
+
+            <div style={styles.subHeader}>
+                Acknowledgement Receipt under Self-Certification Scheme
+            </div>
+
+            {/* APPLICATION INFO */}
+            <table style={styles.table}>
+                <tbody>
+                    <tr>
+                        <td style={styles.td}><span style={styles.label}>Application No.:</span> {data.ApplicationNo}</td>
+                        <td style={styles.td} align="right">
+                            <span style={styles.label}>Date:</span> {data.ApplicationDate}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {/* APPLICATION DETAILS */}
+            <table style={styles.table}>
+                <tbody>
+                    <tr>
+                        <td colSpan={4} style={styles.section}>Application Details -</td>
+                    </tr>
+                    <tr>
+                        <td style={{ ...styles.td, width: "20%" }}>Application Type :</td>
+                        <td style={styles.td} colSpan={3}>{data.ApplicationName}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {/* PROPERTY DETAILS */}
+            <table style={styles.table}>
+                <tbody>
+                    <tr>
+                        <td colSpan={4} style={styles.section}>Property Details -</td>
+                    </tr>
+                    <tr>
+                        <td style={styles.td}>Scheme Name :</td>
+                        <td style={styles.td}>{data.PropertyDetails?.SchemeName}</td>
+                        <td style={styles.td}>Plot No :</td>
+                        <td style={styles.td}>{data.PropertyDetails?.PlotNumber}</td>
+                    </tr>
+                    <tr>
+                        <td style={styles.td}>Area :</td>
+                        <td style={styles.td}>{data.PropertyDetails?.Area}</td>
+                        <td style={styles.td}>Sale Type :</td>
+                        <td style={styles.td}>{data.PropertyDetails?.SaleType}</td>
+                    </tr>
+                    <tr>
+                        <td style={styles.td}>Property Type :</td>
+                        <td style={styles.td}>{data.PropertyDetails?.PropertyType}</td>
+                        <td style={styles.td}>LOI Number :</td>
+                        <td style={styles.td}>{data.PropertyDetails?.LOINumber}</td>
+                    </tr>
+                    <tr>
+                        <td style={styles.td}>LOI Date :</td>
+                        <td style={styles.td}>{data.PropertyDetails?.LOIDate}</td>
+                        <td />
+                        <td />
+                    </tr>
+                </tbody>
+            </table>
+
+            {/* APPLICANT DETAILS */}
+            <table style={styles.table}>
+                <tbody>
+                    <tr>
+                        <td colSpan={4} style={styles.section}>Applicants Details -</td>
+                    </tr>
+                    <tr>
+                        <td style={styles.td}>Applicant Name :</td>
+                        <td style={styles.td} colSpan={3}>{data.ApplicantDetails?.Name}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {/* COMMUNICATION */}
+            <table style={styles.table}>
+                <tbody>
+                    <tr>
+                        <td colSpan={4} style={styles.section}>Communication Details -</td>
+                    </tr>
+                    <tr>
+                        <td style={styles.td}>Mobile Number :</td>
+                        <td style={styles.td}>{data.ApplicantDetails?.Mobile}</td>
+                        <td style={styles.td}>Email Address :</td>
+                        <td style={styles.td}>{data.ApplicantDetails?.Email}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {/* CHECKLIST */}
+            <table style={styles.table}>
+                <tbody>
+                    <tr>
+                        <td colSpan={4} style={styles.section}>Checklist of Uploaded Documents -</td>
+                    </tr>
+                    <tr>
+                        <td colSpan={4} style={styles.td}>
+                            <ol style={styles.checklist}>
+                              {(data.Documents || []).map((doc, i) => (
+        <li key={doc.DocumentId || i}>
+            {doc.Name || doc.FileName || "Document"}
+        </li>
+    ))}
+                            </ol>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {/* NOTES */}
+            <div style={styles.note}>
+                Note: <br />
+                1. All the required documents as mentioned in the checklist are duly filled and attested by the applicant.<br />
+                2. This is computer generated automatic receipt vide application No. {data.ApplicationNo}. NO Signature Is Required.
+            </div>
+
+        </div>
     )
 }
+
 
 
 const mapStateToProps = (state) => ({

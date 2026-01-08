@@ -45,6 +45,8 @@ import rescheduleAppointmentByCitizen from './reducers/rescheduleAppointmentByCi
 import getAppointmentHistory from './reducers/getAppointmentHistoryReducer'
 import getPropertyDetailByNocNumber from './reducers/getPropertyDetailByNocNumberReducer'
 import saveChangeOfOwnershipApplication from './reducers/saveChangeOfOwnershipApplicationReducer'
+import saveApplicationAsDraft from './reducers/saveApplicationAsDraftReducer'
+import getDraftApplicationDetails from './reducers/getDraftApplicationDetailsReducer'
 import getNocByUpn from './reducers/getNocByUpnReducer'
 import saveEditApplication from './reducers/saveEditApplicationReducer'
 import viewEditApplication from './reducers/viewEditApplicationReducer'
@@ -148,6 +150,8 @@ export default combineReducers({
     getAppointmentHistory,
     getPropertyDetailByNocNumber,
     saveChangeOfOwnershipApplication,
+    saveApplicationAsDraft,
+    getDraftApplicationDetails,
     getNocByUpn,
     saveEditApplication,
     viewEditApplication,

@@ -150,7 +150,7 @@ const ServiceDetailPage = props => {
                         {verifyUpnAndMobileSubmitOtpState.apiState === "success" &&
                             [(serviceId === '21' || serviceId === '1048' || serviceId === '20' || serviceId === '1509' || serviceId === '1508' || serviceId === '26' || (getPropertyDetailByNocNumberState.data.Source === 'Old' && serviceId === '25') ? true : false || (getPropertyDetailByNocNumberState.data.Source === 'Old' && serviceId === '32') ? true : false) ?
                                 <ApplicationForm serviceId={serviceId} changeOfOwnerShip={(serviceId === '1509' || serviceId === '1508' || serviceId === '26' || serviceId === '25' || serviceId === '32') ? true : false} />
-                                : <NdcForm serviceId={serviceId} />
+                                : <NdcForm serviceId={serviceId} applicationId={verifyUpnAndMobileSubmitOtpState?.data?.ApplicationId} />
                             ]
                         }
                     </DetailContainer>
