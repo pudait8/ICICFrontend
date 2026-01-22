@@ -621,14 +621,14 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
             ? builtUpAreaList.length - 1
             : builtUpAreaList.length;
 
-        if (applicationType !== "Revised" && (!area || area === "")) {
+        if (applicationType !== "Revised" && applicationType !== "Superseded" && (!area || area === "")) {
             message.error("Please enter area");
             return;
         }
 
         // Validation: Numeric values should be greater than 1
         const numericArea = parseFloat(area);
-        if (applicationType !== "Revised" && (isNaN(numericArea) || numericArea <= 1)) {
+        if (applicationType !== "Revised" && applicationType !== "Superseded" && (isNaN(numericArea) || numericArea <= 1)) {
             message.error("Area must be a number greater than 1");
             return;
         }
