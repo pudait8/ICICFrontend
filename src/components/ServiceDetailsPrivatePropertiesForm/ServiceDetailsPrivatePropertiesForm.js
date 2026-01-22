@@ -175,7 +175,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         { label: "Ground Floor", value: 0 },
         { label: "First Floor", value: 1 },
         { label: "Second Floor", value: 2 },
-        { label: "Third Floor", value: 3 },
+        { label: "Mumty", value: 3 },
     ];
 
     const thStyle = {
@@ -604,6 +604,16 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         message.error("calculateFee function needs to be implemented");
     };
 
+    // Calculate the number of non-basement floors added
+    const getNonBasementFloorCount = () => {
+        return builtUpAreaList.filter(item => item.floor >= 0).length;
+    };
+
+    // Check if max floors (3) have been reached (excluding basement)
+    const isMaxFloorsReached = () => {
+        return getNonBasementFloorCount() >= 4; // Ground floor (0) + 3 floors (1, 2, 3) = 4 floors total
+    };
+
     const handleBuiltUpArea = async ({ area }) => {
         // Validation: All fields are required
         // if (!floor) {
@@ -620,6 +630,21 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         const floor = hasBasement
             ? builtUpAreaList.length - 1
             : builtUpAreaList.length;
+
+        // Check if max floors reached (3 floors + ground floor = 4 total, basement is separate)
+        // Only check when adding new floor, not when editing
+        if (editingIndex === null) {
+            // If trying to add a non-basement floor and max is reached
+            if (floor >= 0 && getNonBasementFloorCount() >= 4) {
+                message.error("Cannot add more than 3 floors (mumty room)");
+                return;
+            }
+            // If trying to add floor beyond Third Floor (value > 3)
+            if (floor > 3) {
+                message.error("Cannot add more than 3 floors (mumty room)");
+                return;
+            }
+        }
 
         if (applicationType !== "Revised" && applicationType !== "Superseded" && (!area || area === "")) {
             message.error("Please enter area");
