@@ -176,9 +176,6 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         { label: "First Floor", value: 1 },
         { label: "Second Floor", value: 2 },
         { label: "Third Floor", value: 3 },
-        { label: "Fourth Floor", value: 4 },
-        { label: "Fifth Floor", value: 5 },
-        { label: "Sixth Floor", value: 6 },
     ];
 
     const thStyle = {
@@ -624,14 +621,14 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
             ? builtUpAreaList.length - 1
             : builtUpAreaList.length;
 
-        if (!area || area === "") {
+        if (applicationType !== "Revised" && (!area || area === "")) {
             message.error("Please enter area");
             return;
         }
 
         // Validation: Numeric values should be greater than 1
         const numericArea = parseFloat(area);
-        if (isNaN(numericArea) || numericArea <= 1) {
+        if (applicationType !== "Revised" && (isNaN(numericArea) || numericArea <= 1)) {
             message.error("Area must be a number greater than 1");
             return;
         }
