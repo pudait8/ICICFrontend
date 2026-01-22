@@ -115,7 +115,7 @@ export const ServiceDetailsPrivatePropertiesFormReadOnly = (props) => {
                         <CheckboxLabel>{document.DocumentName} {(document.IsPVerificationRequired || document.SampleFileURL) && <br />}
                             <Space>
                                 {document.SampleFileURL ? <Link to={{ pathname: document.SampleFileURL }} target="_blank" style={{ textDecoration: 'underline', color: '#006fc3' }}>Download Sample Document.</Link> : null}
-                                {document.IsPVerificationRequired && props.serviceId !== 1796 || props.serviceId !== 1625 &&
+                                {document.IsPVerificationRequired &&
                                     <Alert
                                         message="Physical verification required."
                                         type="warning"
