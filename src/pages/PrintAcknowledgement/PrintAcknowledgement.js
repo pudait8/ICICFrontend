@@ -36,7 +36,7 @@ const PrintAcknowledgement = props => {
     return (
         <>
             {getApplicationDetailState.uiState === "ideal" && (
-    getApplicationDetailState.data.ApplicationTypeId === 1791 //change in prod
+    (getApplicationDetailState.data.ApplicationTypeId === 1791 || getApplicationDetailState.data.ApplicationTypeId === 1796)
         ? <BPPrintLayout data={getApplicationDetailState.data} />
         : <DefaultAcknowledgement {...props} />
 )}

@@ -428,7 +428,7 @@ const SecurityCheck = props => {
                     }
                 </>
                 :
-                (props.serviceId === '1626' || props.serviceId === '1625' || props.serviceId === '951' ||props.serviceId === '1788' ) ?
+                (props.serviceId === '1626' || props.serviceId === '1625' || props.serviceId === '951' ||props.serviceId === '1788' || props.serviceId === '1796' ) ?
                     <>
                         {!apiSuccess ?
                             <Form

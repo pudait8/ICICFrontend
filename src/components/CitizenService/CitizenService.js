@@ -48,7 +48,7 @@ const CitizenService = props => {
         else if (id === 2000) {
             setServiceUrl(`/service-details-loi/${id}`)
         }
-        else if (id === 1626 || id === 1625) {
+        else if (id === 1626 || id === 1625 || id === 1796 || id === 1788) {
             setServiceUrl(`/service-details-private-properties/${id}`)
         }
         else {

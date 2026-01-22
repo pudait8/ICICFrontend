@@ -377,6 +377,7 @@ const NdcForm = (props) => {
   const [displayPaymentStatusModal, setDisplayPaymentStatusModal] =
     useState(false);
   const [acknowledgeDisabled, setAcknowledgeDisabled] = useState(true);
+  const [paymentOnly, setPaymentOnly] = useState(false);
 
   const paymentSuccessAnimationOptions = {
     loop: false,
@@ -498,6 +499,11 @@ const NdcForm = (props) => {
       AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken,
       AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey,
     });
+  }, []);
+
+  useEffect(() => {
+    let isDemandNoteCreated = props.serviceId === "1791" && verifyUpnAndMobileSubmitOtpState.data.ApplicationDemandNoteId > 0 && verifyUpnAndMobileSubmitOtpState.data.ApplicationDemandNoteStatus == 1;
+    setPaymentOnly(isDemandNoteCreated);
   }, []);
 
   useEffect(() => {
@@ -908,7 +914,7 @@ const NdcForm = (props) => {
   }, []);
 
   useEffect(() => {
-    if (props.applicationId) {
+    if (props.applicationId && verifyUpnAndMobileSubmitOtpState?.data?.ApplicationDemandNoteStatus != 2) {
       setApplicationId(props.applicationId);
     }
   }, [props.applicationId]);
@@ -1107,10 +1113,10 @@ const NdcForm = (props) => {
     if (PropertyDuePaymentsState.paymentIntegrationApiState === "ideal") {
       handleSubmit();
       // window.location = "https://gmadaipms.in/PaymentGateWay/PayNow_New.aspx?UniqueId=6ad15a5d-c5ec-44b0-bc42-5027875abae9&UserId=0&Amount=1&AuthTokenKey=ZwKYJJij3aXA5%2BAXsqHwpeeOgGoB%2FD9AzSpeZaZRWu9czRThasIkbYMROefX1MKgpqT4rBMS7tI3HZK7YD%2FEC%2Fa0GDpAq0TxVLnEZrA9G5psSLdRG%2BszRltIOR77dyI5aJggU24yJ%2Bq0QwPMDgO4g4vceTNifAYg6wb73Q8FJ10Rgzleu6trW7%2BCASJrnFht&AuthToken=xAqtZpEX9QNKhssg6XslvA%3D%3D&ArchitectToken=null&ArchitectTokenKey=null";
-      window.location = `${PropertyDuePaymentsState.paymentIntegrationPayload.URL
+      let url = `${PropertyDuePaymentsState.paymentIntegrationPayload.URL
         }?UniqueId=${PropertyDuePaymentsState.paymentIntegrationPayload.UniqueId
         }&UserId=${PropertyDuePaymentsState.paymentIntegrationPayload.UserId
-        }&Amount=${1}&AuthTokenKey=${encodeURIComponent(
+        }&Amount=${demandNoteData.TotalAmount}&AuthTokenKey=${encodeURIComponent(
           verifyUpnAndMobileSubmitOtpState.AuthTokenKey
         )}&AuthToken=${encodeURIComponent(
           verifyUpnAndMobileSubmitOtpState.AuthToken
@@ -1119,6 +1125,9 @@ const NdcForm = (props) => {
         )}&ArchitectTokenKey=${encodeURIComponent(
           verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey
         )}`;
+
+        console.error(url);
+        window.location = url;
       //handleSubmit();
     }
 
@@ -1135,10 +1144,16 @@ const NdcForm = (props) => {
       )
     ) {
       if (props.serviceId === "1791") {
+        console.log("PRODUCTION CHECK: paymentStatus before success");
+        console.error("PRODUCTION CHECK: error paymentStatus before success");
+
         if (PropertyDuePaymentsState.paymentStatus === "Success") {
+          console.log("PRODUCTION CHECK: paymentStatus after success");
+          console.error("PRODUCTION CHECK: error paymentStatus after success");
+
           postAutoDCR({
             OrgId: OrgId,
-            ApplicationId: props.applicationId,
+            ApplicationId: applicationId,
             AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken ?? "",
             AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey ?? "",
             ArchitectToken:
@@ -1147,7 +1162,18 @@ const NdcForm = (props) => {
               verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey ?? "",
           });
           // Call handleSubmit after postAutoDCR when payment is successful
+          console.log("PRODUCTION CHECK: paymentStatus after dcr");
+          console.error("PRODUCTION CHECK: error paymentStatus after dcr");
+
           handleSubmit();
+
+          console.log("PRODUCTION CHECK: after dcr handle submit");
+          console.error("PRODUCTION CHECK: error after dcr handle submit");
+
+          setRedirect([
+            true,
+            "/ndc-details/" + applicationId,
+          ]);
         }
       }
 
@@ -1230,6 +1256,7 @@ const NdcForm = (props) => {
       (applicationType == "Revised" || applicationType == "Superseded") &&
       Number(formValues.TotalExistingArea) <= 0
     ) {
+      setExistingAreaScrutinyAmount(0);
       message.error("Please enter total existing area");
       return;
     }
@@ -1242,9 +1269,9 @@ const NdcForm = (props) => {
         ApplicationType: applicationType,
         WallConstructLength: 0,
         NoOfFloors: builtUpAreaList.length,
-        ConstructionCost: formValues.TotalConstructionCost,
-        ConstructArea: area,
-        TotalExistingArea: formValues.TotalExistingArea,
+        ConstructionCost: formValues.TotalConstructionCost || 0,
+        ConstructArea: area || 0,
+        TotalExistingArea: formValues.TotalExistingArea || 0,
       };
 
       const response = await fetch(
@@ -1262,9 +1289,16 @@ const NdcForm = (props) => {
       );
 
       const data = await response.json();
-      if (data.Status === 2 && data.CustomObject) {
-        return data.CustomObject;
-      } else {
+       if (data.Status === 2 && data.CustomObject) {
+                const formattedObject = Object.fromEntries(
+                    Object.entries(data.CustomObject).map(([key, value]) => [
+                        key,
+                        Number(value).toFixed(2) * 1 // converts back to number
+                    ])
+                );
+
+                return formattedObject;
+            } else {
         message.error(data.Message || "Failed to calculate fees");
       }
     } catch (error) {
@@ -1549,7 +1583,7 @@ const NdcForm = (props) => {
             OrgId: verifyUpnAndMobileState.data.OrgId,
             ApiParams: {
               ApplicationId:
-                verifyUpnAndMobileSubmitOtpState.data.ApplicationId,
+                applicationId,
               ApplicationType: props.serviceId,
               PropertyRefId:
                 verifyUpnAndMobileSubmitOtpState.data.PropertyRefId,
@@ -1557,7 +1591,7 @@ const NdcForm = (props) => {
               Mobile: "",
               EmailId: "",
               Remark: formData.Remark,
-              TemporaryApplicationId: getDocumentListState.EntityId,
+              TemporaryApplicationId: getDocumentListState.EntityId ?? 0,
               GPASPA: "N",
               OwnerId: verifyUpnAndMobileState.data.OwnerId,
               OrgId: OrgId,
@@ -1730,17 +1764,39 @@ const NdcForm = (props) => {
     // window.open(`/print-acknowledgement/276730}`, "_blank"); //harcoded
   };
 
-  const handleModalPayNow = () => {
+  const handleModalPayNow = async () => {
     setPayDisabled(true); // optional: disable button immediately
     setDemandNoteModalVisible(false);
     setAcknowledgeDisabled(false);
     setSubmitAsDraftDisabled(true);
+
+    const result = await saveDemandNote();
+
+    if (!result) {
+      setPayDisabled(false); // rollback
+      message.error("Unable to save demand note");
+      return;
+    }
+
+    console.error("getPaymentIntegrationPayload DemandNoteId" + result?.CustomObject?.DemandNoteId);
+    console.error("getPaymentIntegrationPayload PropertyRefId" + verifyUpnAndMobileSubmitOtpState.data.PropertyRefId);
+console.error(
+  "getPaymentIntegrationPayload demandNoteData: " +
+  JSON.stringify(demandNoteData)
+);
+  console.error("getPaymentIntegrationPayload org" + OrgId);
+
+   console.error("getPaymentIntegrationPayload authtoken" + verifyUpnAndMobileSubmitOtpState.AuthToken);
+
+    console.error("getPaymentIntegrationPayload authkey" + verifyUpnAndMobileSubmitOtpState.AuthTokenKey);
+
+
     getPaymentIntegrationPayload({
       PropertyRefId: verifyUpnAndMobileSubmitOtpState.data.PropertyRefId,
       OrgId: OrgId,
       TotalDueAmount: demandNoteData?.TotalDueAmount || 0,
       headDetails: demandNoteData?.headDetails || [],
-      DemandNoteId: demandNoteData?.DemandNoteId, // ✅ REAL VALUE
+      DemandNoteId: result.CustomObject.DemandNoteId ?? 0, // ✅ REAL VALUE
       EntityType: demandNoteData?.EntityType, // ✅ REAL VALUE
       AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken ?? "",
       AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey ?? "",
@@ -1753,25 +1809,29 @@ const NdcForm = (props) => {
   const handlePayNowClick = async () => {
     try {
       // ✅ STEP 0: Trigger all form validations
-      await form.validateFields();
 
-      // ✅ STEP 1: Extra check for mandatory document upload
-      const missingDocs = getDocumentListState.list.filter((item, idx) => {
-        if (!item.IsMandatory) return false;
+      if (!paymentOnly) {
+        await form.validateFields();
 
-        const hasUploadedFile = !!_.find(defaultFileList, {
-          documentTypeId: item.DocumentTypeId,
+        // ✅ STEP 1: Extra check for mandatory document upload
+        const missingDocs = getDocumentListState.list.filter((item, idx) => {
+          if (!item.IsMandatory) return false;
+
+          const hasUploadedFile = !!_.find(defaultFileList, {
+            documentTypeId: item.DocumentTypeId,
+          });
+
+          return !hasUploadedFile;
         });
 
-        return !hasUploadedFile;
-      });
+        if (missingDocs.length > 0) {
+          message.error("Please upload all mandatory documents before payment.");
+          return;
+        }
+        // Step 1: Save as draft and calculate fees
 
-      if (missingDocs.length > 0) {
-        message.error("Please upload all mandatory documents before payment.");
-        return;
+        await saveDraftAndWait();
       }
-      // Step 1: Save as draft and calculate fees
-      await saveDraftAndWait();
       const calculatedFee = await handleCalculateFee(false);
 
       if (
@@ -1787,16 +1847,19 @@ const NdcForm = (props) => {
       // Step 2: Prepare demand note data
       const scrutinyWithGST =
         calculatedFee.ScrutinyFee + calculatedFee.ScrutinyFee * 0.18;
-      const totalAmount =
-        scrutinyWithGST +
-        calculatedFee.SecurityFee +
-        calculatedFee.LabourCessFee;
+   const totalAmount = Math.round(
+  scrutinyWithGST +
+  calculatedFee.SecurityFee +
+  calculatedFee.LabourCessFee
+);
+
 
       setDemandNoteData({
         TotalAmount: totalAmount,
         ScrutinyFee: calculatedFee.ScrutinyFee,
         SecurityFee: calculatedFee.SecurityFee,
         LabourCessFee: calculatedFee.LabourCessFee,
+        GST: (calculatedFee.ScrutinyFee || 0) * 0.18,
         headDetails: [
           {
             HeadId: 989,
@@ -1805,8 +1868,8 @@ const NdcForm = (props) => {
             TobePaidAmount: calculatedFee.ScrutinyFee || 0,
           },
           {
-            HeadId: 1074,
-            HeadName: "Security Building Plan",
+            HeadId: 928,
+            HeadName: "Security Charges",
             DueAmount: calculatedFee.SecurityFee || 0,
             TobePaidAmount: calculatedFee.SecurityFee || 0,
           },
@@ -1823,11 +1886,11 @@ const NdcForm = (props) => {
             TobePaidAmount: (calculatedFee.ScrutinyFee || 0) * 0.18,
           },
         ], //remove hard code
-        DemandNoteId: 0,
-        EntityType: 0,
+        DemandNoteId: !paymentOnly ? 0 : verifyUpnAndMobileSubmitOtpState?.data?.ApplicationDemandNoteId,
+        EntityType: 111,
         PropertyRefId: verifyUpnAndMobileSubmitOtpState.data.PropertyRefId,
         OrgId: OrgId,
-        TotalDueAmount: 1,
+        TotalDueAmount: totalAmount,
       });
 
       // Step 3: Show modal
@@ -2260,6 +2323,54 @@ const NdcForm = (props) => {
     setFarEditIndex(null);
   };
 
+  const saveDemandNote = async () => {
+    try {
+      const payload = {
+        ApplicationId: applicationId,
+        OrgId: OrgId,
+        EntityRefId: 111,
+        ScrutinyFee: demandNoteData.ScrutinyFee,
+        SecurityFee: demandNoteData.SecurityFee,
+        LabourCessFee: demandNoteData.LabourCessFee,
+        GST: demandNoteData.GST
+      };
+
+      const response = await fetch(
+        // "http://localhost:57657/api/PMS_EnterprenurService/GetFeeInfo?orgId=3",
+        `${conf.api.base_url}PMS_EnterprenurService/AddUpdatePropertyDemandNote`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken,
+            AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey,
+          },
+          body: JSON.stringify(payload)
+        });
+
+
+      if (!response.ok) {
+        console.error("HTTP Error:", response.status);
+        message.error("Failed to save demand note");
+        return null;
+      }
+
+      const data = await response.json();
+
+
+      if (data?.Status !== 2) {
+        message.error(data?.Message || "Failed to save demand note");
+        return null;
+      }
+
+      return data; // ✅ RETURN SUCCESS DATA
+    } catch (error) {
+      console.error("Save Demand Note Error:", error);
+      message.error("Error saving demand note");
+      return null;
+    }
+  };
+
   console.log("NDC FORm");
   return (
     <>
@@ -2388,7 +2499,8 @@ const NdcForm = (props) => {
                 </Col>
               </Row>
 
-              <Heading>Details of Boundary Wall</Heading>
+              {/* <Heading>Details of Boundary Wall</Heading> */}
+              <Heading>Site, Area and Cost Details</Heading>
               <Row gutter={24} align="middle">
                 <Col span="6">
                   <FormItem
@@ -2470,6 +2582,7 @@ const NdcForm = (props) => {
                           type="primary"
                           onClick={() => handleBuiltUpArea({ area })}
                           style={{ marginTop: "30px" }}
+                          disabled={paymentOnly}
                         >
                           {editingIndex !== null ? "Update" : "Add"}
                         </Button>
@@ -2552,7 +2665,7 @@ const NdcForm = (props) => {
                                 >
                                   Edit
                                 </Button>
-                                {index == builtUpAreaList.length - 1 && (
+                                {index == builtUpAreaList.length - 1 && !paymentOnly && (
                                   <Button
                                     size="small"
                                     type="link"
@@ -2964,7 +3077,7 @@ const NdcForm = (props) => {
                       handleCalculateFee(true);
                     }}
                     loading={feeLoading}
-                    disabled={totalArea <= 0}
+                    disabled={totalArea <= 0 || paymentOnly}
                   >
                     Calculate
                   </BlueButton>
@@ -3633,8 +3746,8 @@ const NdcForm = (props) => {
                         <Col span="8">
                           <FormItem
                             label={`${purchaser.SalutationId === 88
-                                ? "Husband Name"
-                                : "Father Name"
+                              ? "Husband Name"
+                              : "Father Name"
                               }`}
                           >
                             <Input
@@ -4624,7 +4737,7 @@ const NdcForm = (props) => {
               </>
             )}
 
-          {getDocumentListState.apiState === "success" && (
+          {getDocumentListState.apiState === "success" && !paymentOnly && (
             <>
               <Heading>Documents Required</Heading>
               {getDocumentListState.list.map((item, idx) => (
@@ -4964,27 +5077,26 @@ const NdcForm = (props) => {
           )}
           <BlankSpace />
 
-          {getDocumentListState.apiState === "success" &&
-            (serviceId === "1791" ? (
-              <Space size="middle">
-                <BlueButton
-                  disabled={submitAsDraftDisabled}
-                  loading={saveApplicationAsDraftState.apiState === "loading"}
-                  onClick={handleSaveAsDraft}
-                >
-                  Save Application As Draft
-                </BlueButton>
+          {(serviceId === "1791" ? (
+            <Space size="middle">
+              <BlueButton
+                disabled={submitAsDraftDisabled || paymentOnly}
+                loading={saveApplicationAsDraftState.apiState === "loading"}
+                onClick={handleSaveAsDraft}
+              >
+                Save Application As Draft
+              </BlueButton>
 
-                <BlueButton
-                  disabled={payDisabled}
-                  loading={
-                    saveChangeOfOwnershipApplicationState.apiState === "loading"
-                  }
-                  onClick={handlePayNowClick}
-                >
-                  PAY NOW
-                </BlueButton>
-               
+              <BlueButton
+                disabled={payDisabled}
+                loading={
+                  saveChangeOfOwnershipApplicationState.apiState === "loading"
+                }
+                onClick={handlePayNowClick}
+              >
+                PAY NOW
+              </BlueButton>
+
               {/* <BlueButton
                 disabled={acknowledgeDisabled}
                 icon={<PrinterFilled />}
@@ -4992,8 +5104,11 @@ const NdcForm = (props) => {
               >
                 ACKNOWLEDGEMENT
               </BlueButton> */}
-              </Space>
-            ) : (
+            </Space>
+          ) :
+
+            getDocumentListState.apiState === "success" &&
+            (
               <BlueButton
                 disabled={submitDocumentStatus}
                 loading={
@@ -5265,7 +5380,7 @@ const NdcForm = (props) => {
           )}
 
           <FlexDiv>
-            <Link to={`/ndc-details/${props.applicationId}?org=${OrgId}}`}>
+            <Link to={`/ndc-details/${applicationId}?org=${OrgId}}`}>
               <BlueButton
                 onClick={() => {
                   setDisplayPaymentStatusModal(false);

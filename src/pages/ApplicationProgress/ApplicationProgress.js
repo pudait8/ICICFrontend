@@ -367,18 +367,18 @@ const ApplicationProgress = props => {
                                                                         centered
                                                                     >
                                                                         <DemandNote
-                                                                            amount={action.CustomPayload[0].TotalDueAmount}
+                                                                            amount={action.CustomPayload[0]?.TotalDueAmount}
                                                                             rows={action.CustomPayload && action.CustomPayload[0] && action.CustomPayload[0].headDetails || []}
                                                                         />
                                                                         <Footer>
-                                                                            {action.CustomPayload && action.CustomPayload[0] && action.CustomPayload[0].TotalDueAmount &&
+                                                                            {action.CustomPayload && action.CustomPayload[0] && action.CustomPayload[0]?.TotalDueAmount &&
                                                                                 <FlexDiv><BlueButton
                                                                                     icon={<SendIcon size={12} />}
                                                                                     loading={["loading", "ideal"].includes(PropertyDuePaymentsState.paymentIntegrationApiState) ? true : false}
                                                                                     onClick={() => getPaymentIntegrationPayload({
                                                                                         PropertyRefId: action.CustomPayload[0].PropertyRefId,
                                                                                         OrgId: action.CustomPayload[0].OrgId,
-                                                                                        TotalDueAmount: action.CustomPayload[0].TotalDueAmount,
+                                                                                        TotalDueAmount: action.CustomPayload[0]?.TotalDueAmount,
                                                                                         headDetails: action.CustomPayload[0].headDetails,
                                                                                         DemandNoteId: action.CustomPayload[0].DemandNoteId,
                                                                                         EntityType: action.CustomPayload[0].EntityType,
@@ -412,7 +412,7 @@ const ApplicationProgress = props => {
                                                                         centered
                                                                     >
                                                                         <DemandNote
-                                                                            amount={action.CustomPayload[0].TotalDueAmount}
+                                                                            amount={action.CustomPayload[0]?.TotalDueAmount}
                                                                             rows={action.CustomPayload && action.CustomPayload[0] && action.CustomPayload[0].headDetails || []}
                                                                         />
                                                                     </Modal>
@@ -421,12 +421,36 @@ const ApplicationProgress = props => {
                                                         }
 
                                                         if (action.slug === "print_acknowledgement") {
-                                                            return (
-                                                                <Link to={`/print-acknowledgement/${props.ApplicationId}`} target={"_blank"} >
-                                                                    <BlueButton style={{ marginTop: '6px' }} onClick={acknowledgement} icon={<PrinterFilled />}>{action.Label || "Action"}</BlueButton>
+                                                            const isDisabled =
+                                                                props.ApplicationTypeId == 1791 &&
+                                                                (getApplicationProgressState.list || []).some(i =>
+                                                                    i.displayActions?.some(a => a.slug === "view_pay_demand_note")
+                                                                );
+
+                                                            return isDisabled ? (
+                                                                <BlueButton
+                                                                    style={{ marginTop: "6px" }}
+                                                                    icon={<PrinterFilled />}
+                                                                    disabled
+                                                                >
+                                                                    {action.Label || "Action"}
+                                                                </BlueButton>
+                                                            ) : (
+                                                                <Link
+                                                                    to={`/print-acknowledgement/${props.ApplicationId}`}
+                                                                    target="_blank"
+                                                                >
+                                                                    <BlueButton
+                                                                        style={{ marginTop: "6px" }}
+                                                                        onClick={acknowledgement}
+                                                                        icon={<PrinterFilled />}
+                                                                    >
+                                                                        {action.Label || "Action"}
+                                                                    </BlueButton>
                                                                 </Link>
-                                                            )
+                                                            );
                                                         }
+
 
                                                         if (action.slug === "ask_for_correction") {
                                                             return (
