@@ -1242,6 +1242,21 @@ console.error(
     };
 
 
+    const showPaymentConfirmation = () => {
+        Modal.confirm({
+            title: 'Confirmation',
+            content: 'Are you sure you want to continue? You cannot go back after this.',
+            okText: 'Yes',
+            cancelText: 'No',
+            centered: true,
+            onOk: () => {
+                handlePayNowClick();
+            },
+            onCancel: () => {
+            },
+        });
+    };
+
     const handlePayNowClick = async () => {
         try {
             // ✅ STEP 0: Trigger all form validations
@@ -1977,7 +1992,7 @@ console.error(
                                             <Row>
                                                 <Col span={6}>
                                                     <FormItem
-                                                        label={`Total Area: ${totalArea}`}
+                                                        label={`Total Area: ${totalArea.toFixed(2)}`}
                                                         name="TotalArea"
                                                     ></FormItem>
                                                 </Col>
@@ -2592,7 +2607,7 @@ console.error(
                                     loading={
                                         saveChangeOfOwnershipApplicationState?.apiState === "loading"
                                     }
-                                    onClick={handlePayNowClick}
+                                    onClick={showPaymentConfirmation}
                                 >
                                     SUBMIT & PAY NOW
                                 </BlueButton>
