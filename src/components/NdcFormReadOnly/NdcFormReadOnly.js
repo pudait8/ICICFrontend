@@ -765,7 +765,7 @@ const NdcFormReadOnly = (props) => {
                           Download Sample Document.
                         </Link>
                       ) : null}
-                      {document.IsPVerificationRequired && (
+                      {document.IsPVerificationRequired && props.serviceId !== 1791 || props.serviceId !== 1560 && (
                         <Alert
                           message="Physical verification required."
                           type="warning"
