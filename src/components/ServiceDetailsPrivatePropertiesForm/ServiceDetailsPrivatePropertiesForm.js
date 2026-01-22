@@ -175,10 +175,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         { label: "Ground Floor", value: 0 },
         { label: "First Floor", value: 1 },
         { label: "Second Floor", value: 2 },
-        { label: "Third Floor", value: 3 },
-        { label: "Fourth Floor", value: 4 },
-        { label: "Fifth Floor", value: 5 },
-        { label: "Sixth Floor", value: 6 },
+        { label: "Mumty", value: 3 },
     ];
 
     const thStyle = {
@@ -607,6 +604,16 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         message.error("calculateFee function needs to be implemented");
     };
 
+    // Calculate the number of non-basement floors added
+    const getNonBasementFloorCount = () => {
+        return builtUpAreaList.filter(item => item.floor >= 0).length;
+    };
+
+    // Check if max floors (3) have been reached (excluding basement)
+    const isMaxFloorsReached = () => {
+        return getNonBasementFloorCount() >= 4; // Ground floor (0) + 3 floors (1, 2, 3) = 4 floors total
+    };
+
     const handleBuiltUpArea = async ({ area }) => {
         // Validation: All fields are required
         // if (!floor) {
@@ -624,14 +631,29 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
             ? builtUpAreaList.length - 1
             : builtUpAreaList.length;
 
-        if (!area || area === "") {
+        // Check if max floors reached (3 floors + ground floor = 4 total, basement is separate)
+        // Only check when adding new floor, not when editing
+        if (editingIndex === null) {
+            // If trying to add a non-basement floor and max is reached
+            if (floor >= 0 && getNonBasementFloorCount() >= 4) {
+                message.error("Cannot add more than 3 floors (mumty room)");
+                return;
+            }
+            // If trying to add floor beyond Third Floor (value > 3)
+            if (floor > 3) {
+                message.error("Cannot add more than 3 floors (mumty room)");
+                return;
+            }
+        }
+
+        if (applicationType !== "Revised" && applicationType !== "Superseded" && (!area || area === "")) {
             message.error("Please enter area");
             return;
         }
 
         // Validation: Numeric values should be greater than 1
         const numericArea = parseFloat(area);
-        if (isNaN(numericArea) || numericArea <= 1) {
+        if (applicationType !== "Revised" && applicationType !== "Superseded" && (isNaN(numericArea) || numericArea <= 1)) {
             message.error("Area must be a number greater than 1");
             return;
         }
@@ -1219,6 +1241,21 @@ console.error(
       });
     };
 
+
+    const showPaymentConfirmation = () => {
+        Modal.confirm({
+            title: 'Confirmation',
+            content: 'Are you sure you want to continue? You cannot go back after this.',
+            okText: 'Yes',
+            cancelText: 'No',
+            centered: true,
+            onOk: () => {
+                handlePayNowClick();
+            },
+            onCancel: () => {
+            },
+        });
+    };
 
     const handlePayNowClick = async () => {
         try {
@@ -1955,7 +1992,7 @@ console.error(
                                             <Row>
                                                 <Col span={6}>
                                                     <FormItem
-                                                        label={`Total Area: ${totalArea}`}
+                                                        label={`Total Area: ${totalArea.toFixed(2)}`}
                                                         name="TotalArea"
                                                     ></FormItem>
                                                 </Col>
@@ -2354,7 +2391,7 @@ console.error(
                                                         {(item.IsPVerificationRequired || item.SampleFileURL) &&
                                                             <Space>
                                                                 {item.SampleFileURL ? <Link to={{ pathname: item.SampleFileURL }} target="_blank" style={{ textDecoration: 'underline', color: '#006fc3' }}>Download Sample Document.</Link> : null}
-                                                                {item.IsPVerificationRequired &&
+                                                                {item.IsPVerificationRequired && props.serviceId !== 1796 &&
                                                                     <Alert
                                                                         message="Physical verification required."
                                                                         type="warning"
@@ -2570,7 +2607,7 @@ console.error(
                                     loading={
                                         saveChangeOfOwnershipApplicationState?.apiState === "loading"
                                     }
-                                    onClick={handlePayNowClick}
+                                    onClick={showPaymentConfirmation}
                                 >
                                     SUBMIT & PAY NOW
                                 </BlueButton>
