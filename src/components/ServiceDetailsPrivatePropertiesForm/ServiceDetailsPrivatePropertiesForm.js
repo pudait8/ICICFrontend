@@ -2391,7 +2391,7 @@ console.error(
                                                         {(item.IsPVerificationRequired || item.SampleFileURL) &&
                                                             <Space>
                                                                 {item.SampleFileURL ? <Link to={{ pathname: item.SampleFileURL }} target="_blank" style={{ textDecoration: 'underline', color: '#006fc3' }}>Download Sample Document.</Link> : null}
-                                                                {item.IsPVerificationRequired && props.serviceId !== 1796 || props.serviceId !== 1625 &&
+                                                                {item.IsPVerificationRequired && props.serviceId !== 1796 &&
                                                                     <Alert
                                                                         message="Physical verification required."
                                                                         type="warning"

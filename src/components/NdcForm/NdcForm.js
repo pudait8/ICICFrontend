@@ -4774,7 +4774,7 @@ console.error(
                                     Download Sample Document.
                                   </Link>
                                 ) : null}
-                                {item.IsPVerificationRequired && props.serviceId !== 1791 || props.serviceId !== 1560 && (
+                                {item.IsPVerificationRequired && props.serviceId !== 1791 && (
                                   <Alert
                                     message="Physical verification required."
                                     type="warning"
