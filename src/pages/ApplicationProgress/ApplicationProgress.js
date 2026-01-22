@@ -422,7 +422,7 @@ const ApplicationProgress = props => {
 
                                                         if (action.slug === "print_acknowledgement") {
                                                             const isDisabled =
-                                                                props.ApplicationTypeId == 1791 &&
+                                                                (props.ApplicationTypeId == 1791 || props.ApplicationTypeId == 1796)  &&
                                                                 (getApplicationProgressState.list || []).some(i =>
                                                                     i.displayActions?.some(a => a.slug === "view_pay_demand_note")
                                                                 );
