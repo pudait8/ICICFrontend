@@ -8,7 +8,7 @@ export const toGetPrivateSchemeApi = async (params) => {
         url: `${conf.api.base_url}Gateway_AuthService/ViewDetail`,
         data: {
             "ApiKey": "GetPrivateSchemeList",
-            "OrgId": 3,
+            "OrgId": params?.OrgId || 3,
             "ApiParams": {
             }
         },

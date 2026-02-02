@@ -194,6 +194,28 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     const calculateAmount = (area, rate) => Number(area || 0) * Number(rate || 0);
 
 
+     useEffect(() => {
+        if (saveNdcApplicationState.apiState === "alert") {
+          notification["error"]({
+            message: saveNdcApplicationState.apiMessage,
+            placement: "bottomRight",
+          });
+          saveNdcApplicationResetState();
+        }   
+        
+        if (saveNdcApplicationState.apiState === "success") {
+          notification["success"]({
+            message: saveNdcApplicationState.apiMessage,
+            placement: "bottomRight",
+          });
+          verifyUpnAndMobileSubmitOtpState.submitApplication = true;
+         setRedirect([
+              true,
+              "/ndc-details/" + saveNdcApplicationState.data.ApplicationId,
+            ]);
+        }
+      }, [saveNdcApplicationState]);
+
     useEffect(() => {
         const total = builtUpAreaList.reduce(
             (sum, item) => sum + Number(item.area),
@@ -204,7 +226,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
 
     useEffect(() => {
 
-        let isDemandNoteCreated = props.serviceId === "1625" && verifyUpnAndMobileSubmitOtpState.data.ApplicationDemandNoteId > 0 && verifyUpnAndMobileSubmitOtpState.data.ApplicationDemandNoteStatus == 1;
+        let isDemandNoteCreated = props.serviceId === "1796" && verifyUpnAndMobileSubmitOtpState.data.ApplicationDemandNoteId > 0 && verifyUpnAndMobileSubmitOtpState.data.ApplicationDemandNoteStatus == 1;
 
      // setPaymentOnly(isDemandNoteCreated); //uncomment for production
 
@@ -219,7 +241,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     useEffect(() => {
         setAppId();
         setRedirect(false);
-        toGetPrivateScheme();
+        toGetPrivateScheme({OrgId: OrgId});
         saveNdcApplicationResetState();
         privatePropertyApplicationResetState();
         getDocumentListResetState();
@@ -278,7 +300,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     //             PropertyDuePaymentsState?.paymentStatus
     //         )
     //     ) {
-    //         if (props.serviceId === "1625") {
+    //         if (props.serviceId === "1796") {
     //             // For service ID 1625, handle payment success
     //             if (PropertyDuePaymentsState.paymentStatus === "Success") {
     //                 // You can add postAutoDCR call here if needed for service 1625
@@ -442,7 +464,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
 
     // Handle transfer application fetch state for documents
     useEffect(() => {
-        if (transferApplicationFetchState?.apiState === "success" && props.serviceId === "1625") {
+        if (transferApplicationFetchState?.apiState === "success" && props.serviceId === "1796") {
             if (transferApplicationFetchState.data?.Documents && transferApplicationFetchState.data.Documents.length > 0) {
                 let fileArr = [];
                 transferApplicationFetchState.data.Documents.map((item) => {
@@ -506,7 +528,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
 
     const submit = () => {
         if (saveOwnerPrivatePropertiesState.apiState === 'success') {
-            if (props.serviceId === "1625") {
+            if (props.serviceId === "1796") {
                 saveNdcApplication({
                     ApplicationId: applicationId,
                     OrgId: OrgId,
@@ -599,10 +621,14 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         }
     };
 
-    const calculateExistingAreaFees = async () => {
-        // Implementation will be added based on calculateFee function
-        message.error("calculateFee function needs to be implemented");
-    };
+  const calculateExistingAreaFees = async () => {
+    const data = await calculateFee(0);
+    if (!data) {
+      message.error("Error calculating fees");
+      return;
+    }
+    setExistingAreaScrutinyAmount(data.ExistingAreaScrutinyAmount);
+  };
 
     // Calculate the number of non-basement floors added
     const getNonBasementFloorCount = () => {
@@ -1123,11 +1149,11 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
 
             const formValues = form.getFieldsValue(true);
 
-            // Calculate totals for built-up areas if serviceId is "1625"
+            // Calculate totals for built-up areas if serviceId is "1796"
             let builtUpAreaTotals = { scrutinyFees: 0, labourCess: 0, gst: 0 };
             let totalArea = 0;
 
-            if (props.serviceId === "1625") {
+            if (props.serviceId === "1796") {
                 builtUpAreaTotals = builtUpAreaList.reduce(
                     (acc, item) => ({
                         scrutinyFees: acc.scrutinyFees + (parseFloat(item.scrutinyFee) || 0),
@@ -1179,7 +1205,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                         ExistingAreaScrutinyFee: existingAreaScrutinyAmount,
                         SecurityFees: totalSecurityFees
                     },
-                    builtUpAreaList: props.serviceId === "1625" ? builtUpAreaList.map((item) => ({
+                    builtUpAreaList: props.serviceId === "1796" ? builtUpAreaList.map((item) => ({
                         Floor: item.floor,
                         Area: parseFloat(item.area) || 0,
                         ScrutinyFees: parseFloat(item.scrutinyFee) || 0,
@@ -1226,19 +1252,20 @@ console.error(
 
   const formValues = form.getFieldsValue();
   console.error(formValues.PropertyNumber);
-      getPaymentIntegrationPayload({
-        PropertyRefId: formValues.PropertyNumber,
-        OrgId: OrgId,
-        TotalDueAmount: demandNoteData?.TotalDueAmount || 0,
-        headDetails: demandNoteData?.headDetails || [],
-        DemandNoteId: result.CustomObject.DemandNoteId ?? 0, // ✅ REAL VALUE
-        EntityType: demandNoteData?.EntityType, // ✅ REAL VALUE
-        AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken ?? "",
-        AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey ?? "",
-        ArchitectToken: verifyUpnAndMobileSubmitOtpState.ArchitectToken ?? "",
-        ArchitectTokenKey:
-          verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey ?? "",
-      });
+  submit();
+    //   getPaymentIntegrationPayload({
+    //     PropertyRefId: formValues.PropertyNumber,
+    //     OrgId: OrgId,
+    //     TotalDueAmount: demandNoteData?.TotalDueAmount || 0,
+    //     headDetails: demandNoteData?.headDetails || [],
+    //     DemandNoteId: result.CustomObject.DemandNoteId ?? 0, // ✅ REAL VALUE
+    //     EntityType: demandNoteData?.EntityType, // ✅ REAL VALUE
+    //     AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken ?? "",
+    //     AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey ?? "",
+    //     ArchitectToken: verifyUpnAndMobileSubmitOtpState.ArchitectToken ?? "",
+    //     ArchitectTokenKey:
+    //       verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey ?? "",
+    //   });
     };
 
 
@@ -1298,10 +1325,14 @@ console.error(
             // Step 2: Prepare demand note data
             const scrutinyWithGST =
                 calculatedFee.ScrutinyFee + calculatedFee.ScrutinyFee * 0.18;
-            const totalAmount = Math.round(
-                scrutinyWithGST +
-                calculatedFee.SecurityFee +
-                calculatedFee.LabourCessFee
+       
+
+            const totalAmount = Number(
+                (
+                    scrutinyWithGST +
+                    calculatedFee.SecurityFee +
+                    calculatedFee.LabourCessFee
+                ).toFixed(2)
             );
 
 
@@ -1467,7 +1498,7 @@ console.error(
         PropertyDuePaymentsState.paymentStatus
       )
     ) {
-      if (props.serviceId === "1625") {
+      if (props.serviceId === "1796") {
         console.log("PRODUCTION CHECK: paymentStatus before success");
         console.error("PRODUCTION CHECK: error paymentStatus before success");
 
@@ -1572,11 +1603,12 @@ console.error(
             const payload = {
                 ApplicationId: applicationId,
                 OrgId: OrgId,
-                EntityRefId: 111,
+                EntityRefId: -1,
                 ScrutinyFee: demandNoteData.ScrutinyFee,
                 SecurityFee: demandNoteData.SecurityFee,
                 LabourCessFee: demandNoteData.LabourCessFee,
-                GST: demandNoteData.GST
+                GST: demandNoteData.GST,
+                TotalAmount: demandNoteData.TotalAmount
             };
 
             const response = await fetch(
@@ -1632,7 +1664,7 @@ console.error(
         if (!area || area <= 0) {
             return {
                 isValid: false,
-                message: "Property area must be greater than 0"
+                message: "Property area must be greater than 0. Please update property details."
             };
         }
 
@@ -1738,9 +1770,9 @@ console.error(
                                     rules={[{
                                         required: true,
                                         message: 'Required'
-                                    }]}
+                                    }]}          
                                 >
-                                    <Input readOnly={basedOnProperty} disabled={props.IsRenewal === "Y"} size="large" name="Area" onChange={handleOnChange} />
+                                    <Input readOnly={basedOnProperty} disabled={true} size="large" name="Area" onChange={handleOnChange} />
                                 </FormItem>
                             </Col>
                         </Row>
@@ -1762,7 +1794,7 @@ console.error(
                                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                         }
                                         name="UnitOfArea"
-                                        disabled={props.IsRenewal === "Y" || basedOnProperty}
+                                        disabled={true}
                                         onSelect={(v) => handleOnChangeSelect("UnitOfArea", v)}
                                         size="large"
                                     >
@@ -1784,7 +1816,7 @@ console.error(
                         <BlankSpace />
 
                         {/* Built-up Area Section - Service ID 1560 */}
-                        {props.serviceId === "1625" && (
+                        {props.serviceId === "1796" && (
                             <>
                                 <Row style={{ marginBottom: "20px" }}>
                                     <Col span="8">
@@ -1853,7 +1885,7 @@ console.error(
 
                                 <Heading>Details of Built Up Area</Heading>
                                 <>
-                                    {props.serviceId === "1625" && (
+                                    {props.serviceId === "1796" && (
                                         <>
                                             {builtUpAreaList.length == 0 && (
                                                 <Row gutter="24">
@@ -2592,7 +2624,7 @@ console.error(
                                 </Row>
                             </>
                         }
-                        {props.serviceId === "1625" ? (
+                        {props.serviceId === "1796" ? (
                             <Space size="middle">
                                 {/* <BlueButton
                   disabled={submitAsDraftDisabled}
@@ -2913,7 +2945,7 @@ const mapDispatchToProps = (dispatch) => ({
     getDocumentListResetState: () => dispatch(getDocumentListResetState()),
     getDocumentList: (params) => dispatch(getDocumentList(params)),
     privatePropertyApplicationResetState: () => dispatch(privatePropertyApplicationResetState()),
-    toGetPrivateScheme: () => dispatch(toGetPrivateScheme()),
+    toGetPrivateScheme: (params) => dispatch(toGetPrivateScheme(params)),
     toGetPrivatePropertiesList: (params) => dispatch(toGetPrivatePropertiesList(params)),
     toGetPrivatePropertiesListResetState: () => dispatch(toGetPrivatePropertiesListResetState()),
     saveNdcApplication: (params) => dispatch(saveNdcApplication(params)),

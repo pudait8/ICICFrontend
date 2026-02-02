@@ -1847,11 +1847,14 @@ console.error(
       // Step 2: Prepare demand note data
       const scrutinyWithGST =
         calculatedFee.ScrutinyFee + calculatedFee.ScrutinyFee * 0.18;
-   const totalAmount = Math.round(
-  scrutinyWithGST +
-  calculatedFee.SecurityFee +
-  calculatedFee.LabourCessFee
-);
+      const totalAmount = Number(
+        (
+          scrutinyWithGST +
+          calculatedFee.SecurityFee +
+          calculatedFee.LabourCessFee
+        ).toFixed(2)
+      );
+
 
 
       setDemandNoteData({
@@ -2328,11 +2331,12 @@ console.error(
       const payload = {
         ApplicationId: applicationId,
         OrgId: OrgId,
-        EntityRefId: 111,
+        EntityRefId: verifyUpnAndMobileSubmitOtpState.data.PropertyRefId,
         ScrutinyFee: demandNoteData.ScrutinyFee,
         SecurityFee: demandNoteData.SecurityFee,
         LabourCessFee: demandNoteData.LabourCessFee,
-        GST: demandNoteData.GST
+        GST: demandNoteData.GST,
+        TotalAmount: demandNoteData.TotalAmount
       };
 
       const response = await fetch(
