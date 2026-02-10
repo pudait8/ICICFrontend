@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react"
+import React, { useEffect, useState, useRef, use } from "react"
 import { Col, Form, Row, Upload, Button, notification, Input, DatePicker, Select, Checkbox, InputNumber, Alert, Space, Modal, message } from "antd"
 import { connect } from "react-redux"
 import { UploadOutlined } from '@ant-design/icons'
@@ -194,27 +194,27 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     const calculateAmount = (area, rate) => Number(area || 0) * Number(rate || 0);
 
 
-     useEffect(() => {
+    useEffect(() => {
         if (saveNdcApplicationState.apiState === "alert") {
-          notification["error"]({
-            message: saveNdcApplicationState.apiMessage,
-            placement: "bottomRight",
-          });
-          saveNdcApplicationResetState();
-        }   
-        
+            notification["error"]({
+                message: saveNdcApplicationState.apiMessage,
+                placement: "bottomRight",
+            });
+            saveNdcApplicationResetState();
+        }
+
         if (saveNdcApplicationState.apiState === "success") {
-          notification["success"]({
-            message: saveNdcApplicationState.apiMessage,
-            placement: "bottomRight",
-          });
-          verifyUpnAndMobileSubmitOtpState.submitApplication = true;
-         setRedirect([
-              true,
-              "/ndc-details/" + saveNdcApplicationState.data.ApplicationId,
+            notification["success"]({
+                message: saveNdcApplicationState.apiMessage,
+                placement: "bottomRight",
+            });
+            verifyUpnAndMobileSubmitOtpState.submitApplication = true;
+            setRedirect([
+                true,
+                "/ndc-details/" + saveNdcApplicationState.data.ApplicationId,
             ]);
         }
-      }, [saveNdcApplicationState]);
+    }, [saveNdcApplicationState]);
 
     useEffect(() => {
         const total = builtUpAreaList.reduce(
@@ -228,7 +228,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
 
         let isDemandNoteCreated = props.serviceId === "1796" && verifyUpnAndMobileSubmitOtpState.data.ApplicationDemandNoteId > 0 && verifyUpnAndMobileSubmitOtpState.data.ApplicationDemandNoteStatus == 1;
 
-     // setPaymentOnly(isDemandNoteCreated); //uncomment for production
+        // setPaymentOnly(isDemandNoteCreated); //uncomment for production
 
     }, []);
 
@@ -241,7 +241,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     useEffect(() => {
         setAppId();
         setRedirect(false);
-        toGetPrivateScheme({OrgId: OrgId});
+        toGetPrivateScheme({ OrgId: OrgId });
         saveNdcApplicationResetState();
         privatePropertyApplicationResetState();
         getDocumentListResetState();
@@ -621,14 +621,14 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         }
     };
 
-  const calculateExistingAreaFees = async () => {
-    const data = await calculateFee(0);
-    if (!data) {
-      message.error("Error calculating fees");
-      return;
-    }
-    setExistingAreaScrutinyAmount(data.ExistingAreaScrutinyAmount);
-  };
+    const calculateExistingAreaFees = async () => {
+        const data = await calculateFee(0);
+        if (!data) {
+            message.error("Error calculating fees");
+            return;
+        }
+        setExistingAreaScrutinyAmount(data.ExistingAreaScrutinyAmount);
+    };
 
     // Calculate the number of non-basement floors added
     const getNonBasementFloorCount = () => {
@@ -647,7 +647,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         //   return;
         // }
 
-        let res = isValidForFeesCalculation();
+        let res = isValidForFeesCalculation(area);
         if (!res.isValid) {
             message.error(res.message);
             return;
@@ -673,14 +673,13 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         }
 
         if (applicationType !== "Revised" && applicationType !== "Superseded" && (!area || area === "")) {
-            message.error("Please enter area");
+            message.error("Total area must be greater than 0 for Purposed application type.");
             return;
         }
-
         // Validation: Numeric values should be greater than 1
         const numericArea = parseFloat(area);
-        if (applicationType !== "Revised" && applicationType !== "Superseded" && (isNaN(numericArea) || numericArea <= 1)) {
-            message.error("Area must be a number greater than 1");
+        if (applicationType !== "Revised" && applicationType !== "Superseded" && (isNaN(numericArea) || numericArea <= 0)) {
+            message.error("Area must be a number greater than 0");
             return;
         }
 
@@ -951,7 +950,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         setFarEditIndex(null);
     };
 
-     const calculateFee = async (area) => {
+    const calculateFee = async (area) => {
         const formValues = form.getFieldsValue();
         if (
             (applicationType == "Revised" || applicationType == "Superseded") &&
@@ -994,9 +993,8 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                 TotalExistingArea: formValues.TotalExistingArea || 0,
                 PropertyArea: propertyArea
             };
-
             const response = await fetch(
-                // "http://localhost:57657/api/PMS_EnterprenurService/GetFeeInfo?orgId=3",
+                 //"http://localhost:63990/api/PMS_EnterprenurService/GetFeeInfo?orgId=3",
                 `${conf.api.base_url}PMS_EnterprenurService/GetFeeInfo?orgId=${OrgId}`,
                 {
                     method: "POST",
@@ -1031,46 +1029,46 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         }
     };
 
-  const handleCalculateFee = async (showModal) => {
-    if (totalArea <= 0) {
-      message.error("Please add areas before calculating fees");
-      return;
-    }
-    try {
-      setFeeLoading(true);
-      const data = await calculateFee(totalArea);
-      if (!data) {
-        message.error("Error calculating fees");
-        return;
-      }
-      const formValues = form.getFieldsValue(true);
-      let totalScrutineeFee =
-        (data.ScrutinyAmount || 0) + (data.ExistingAreaScrutinyAmount || 0);
+    const handleCalculateFee = async (showModal) => {
+        if (totalArea <= 0) {
+            message.error("Please add areas before calculating fees");
+            return;
+        }
+        try {
+            setFeeLoading(true);
+            const data = await calculateFee(totalArea);
+            if (!data) {
+                message.error("Error calculating fees");
+                return;
+            }
+            const formValues = form.getFieldsValue(true);
+            let totalScrutineeFee =
+                (data.ScrutinyAmount || 0) + (data.ExistingAreaScrutinyAmount || 0);
 
-      let totalSecurityFee =
-        Number(data.SecurityAmount || 0) -
-        Number(formValues.PaidSecurityAmount || 0);
+            let totalSecurityFee =
+                Number(data.SecurityAmount || 0) -
+                Number(formValues.PaidSecurityAmount || 0);
 
-      const feeResult = {
-        ScrutinyFee:
-          Number(data.ScrutinyAmount) + Number(data.ExistingAreaScrutinyAmount),
-        SecurityFee: totalSecurityFee || 0,
-        LabourCessFee: data.LabourCessAmount || 0,
-        GST: (totalScrutineeFee || 0) * 0.18,
-        headDetails: data.headDetails || [],
-      };
+            const feeResult = {
+                ScrutinyFee:
+                    Number(data.ScrutinyAmount) + Number(data.ExistingAreaScrutinyAmount),
+                SecurityFee: totalSecurityFee || 0,
+                LabourCessFee: data.LabourCessAmount || 0,
+                GST: (totalScrutineeFee || 0) * 0.18,
+                headDetails: data.headDetails || [],
+            };
 
-      setFeeData(feeResult);
-      if (showModal == true) setFeeModalVisible(true);
+            setFeeData(feeResult);
+            if (showModal == true) setFeeModalVisible(true);
 
-      return feeResult;
-    } catch (error) {
-      console.error("Error calculating fees:", error);
-      message.error("Error calculating fees. Please try again.");
-    } finally {
-      setFeeLoading(false);
-    }
-  };
+            return feeResult;
+        } catch (error) {
+            console.error("Error calculating fees:", error);
+            message.error("Error calculating fees. Please try again.");
+        } finally {
+            setFeeLoading(false);
+        }
+    };
 
     // Draft saving functions
     const saveDraftAndWait = () => {
@@ -1090,7 +1088,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         try {
             // First API call to get application data
             if (saveOwnerPrivatePropertiesState.apiState !== 'success') {
-             message.error("Atleast one owner must be added");
+                message.error("Atleast one owner must be added");
                 return;
             }
             const getDataResponse = await fetch(
@@ -1225,47 +1223,47 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     };
 
     const handleModalPayNow = async () => {
-      setPayDisabled(true); // optional: disable button immediately
-      setDemandNoteModalVisible(false);
-    //   setAcknowledgeDisabled(false);
-      setSubmitAsDraftDisabled(true);
-  
-      const result = await saveDemandNote();
-  
-      if (!result) {
-        setPayDisabled(false); // rollback
-        message.error("Unable to save demand note");
-        return;
-      }
-  
-         console.error("getPaymentIntegrationPayload DemandNoteId" + result?.CustomObject?.DemandNoteId);
-    console.error("getPaymentIntegrationPayload PropertyRefId" + verifyUpnAndMobileSubmitOtpState.data.PropertyRefId);
-console.error(
-  "getPaymentIntegrationPayload demandNoteData: " +
-  JSON.stringify(demandNoteData)
-);
-  console.error("getPaymentIntegrationPayload org" + OrgId);
+        setPayDisabled(true); // optional: disable button immediately
+        setDemandNoteModalVisible(false);
+        //   setAcknowledgeDisabled(false);
+        setSubmitAsDraftDisabled(true);
 
-   console.error("getPaymentIntegrationPayload authtoken" + verifyUpnAndMobileSubmitOtpState.AuthToken);
+        const result = await saveDemandNote();
 
-    console.error("getPaymentIntegrationPayload authkey" + verifyUpnAndMobileSubmitOtpState.AuthTokenKey);
+        if (!result) {
+            setPayDisabled(false); // rollback
+            message.error("Unable to save demand note");
+            return;
+        }
 
-  const formValues = form.getFieldsValue();
-  console.error(formValues.PropertyNumber);
-  submit();
-    //   getPaymentIntegrationPayload({
-    //     PropertyRefId: formValues.PropertyNumber,
-    //     OrgId: OrgId,
-    //     TotalDueAmount: demandNoteData?.TotalDueAmount || 0,
-    //     headDetails: demandNoteData?.headDetails || [],
-    //     DemandNoteId: result.CustomObject.DemandNoteId ?? 0, // ✅ REAL VALUE
-    //     EntityType: demandNoteData?.EntityType, // ✅ REAL VALUE
-    //     AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken ?? "",
-    //     AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey ?? "",
-    //     ArchitectToken: verifyUpnAndMobileSubmitOtpState.ArchitectToken ?? "",
-    //     ArchitectTokenKey:
-    //       verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey ?? "",
-    //   });
+        console.error("getPaymentIntegrationPayload DemandNoteId" + result?.CustomObject?.DemandNoteId);
+        console.error("getPaymentIntegrationPayload PropertyRefId" + verifyUpnAndMobileSubmitOtpState.data.PropertyRefId);
+        console.error(
+            "getPaymentIntegrationPayload demandNoteData: " +
+            JSON.stringify(demandNoteData)
+        );
+        console.error("getPaymentIntegrationPayload org" + OrgId);
+
+        console.error("getPaymentIntegrationPayload authtoken" + verifyUpnAndMobileSubmitOtpState.AuthToken);
+
+        console.error("getPaymentIntegrationPayload authkey" + verifyUpnAndMobileSubmitOtpState.AuthTokenKey);
+
+        const formValues = form.getFieldsValue();
+        console.error(formValues.PropertyNumber);
+        submit();
+        //   getPaymentIntegrationPayload({
+        //     PropertyRefId: formValues.PropertyNumber,
+        //     OrgId: OrgId,
+        //     TotalDueAmount: demandNoteData?.TotalDueAmount || 0,
+        //     headDetails: demandNoteData?.headDetails || [],
+        //     DemandNoteId: result.CustomObject.DemandNoteId ?? 0, // ✅ REAL VALUE
+        //     EntityType: demandNoteData?.EntityType, // ✅ REAL VALUE
+        //     AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken ?? "",
+        //     AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey ?? "",
+        //     ArchitectToken: verifyUpnAndMobileSubmitOtpState.ArchitectToken ?? "",
+        //     ArchitectTokenKey:
+        //       verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey ?? "",
+        //   });
     };
 
 
@@ -1325,7 +1323,7 @@ console.error(
             // Step 2: Prepare demand note data
             const scrutinyWithGST =
                 calculatedFee.ScrutinyFee + calculatedFee.ScrutinyFee * 0.18;
-       
+
 
             const totalAmount = Number(
                 (
@@ -1463,78 +1461,78 @@ console.error(
         }
     };
 
-  useEffect(() => {
-    if (!PropertyDuePaymentsState) return;
-    if (PropertyDuePaymentsState.paymentIntegrationApiState === "ideal") {
-      submit();
-      // window.location = "https://gmadaipms.in/PaymentGateWay/PayNow_New.aspx?UniqueId=6ad15a5d-c5ec-44b0-bc42-5027875abae9&UserId=0&Amount=1&AuthTokenKey=ZwKYJJij3aXA5%2BAXsqHwpeeOgGoB%2FD9AzSpeZaZRWu9czRThasIkbYMROefX1MKgpqT4rBMS7tI3HZK7YD%2FEC%2Fa0GDpAq0TxVLnEZrA9G5psSLdRG%2BszRltIOR77dyI5aJggU24yJ%2Bq0QwPMDgO4g4vceTNifAYg6wb73Q8FJ10Rgzleu6trW7%2BCASJrnFht&AuthToken=xAqtZpEX9QNKhssg6XslvA%3D%3D&ArchitectToken=null&ArchitectTokenKey=null";
-      let url = `${PropertyDuePaymentsState.paymentIntegrationPayload.URL
-        }?UniqueId=${PropertyDuePaymentsState.paymentIntegrationPayload.UniqueId
-        }&UserId=${PropertyDuePaymentsState.paymentIntegrationPayload.UserId
-        }&Amount=${demandNoteData.TotalAmount}&AuthTokenKey=${encodeURIComponent(
-          verifyUpnAndMobileSubmitOtpState.AuthTokenKey
-        )}&AuthToken=${encodeURIComponent(
-          verifyUpnAndMobileSubmitOtpState.AuthToken
-        )}&ArchitectToken=${encodeURIComponent(
-          verifyUpnAndMobileSubmitOtpState.ArchitectToken
-        )}&ArchitectTokenKey=${encodeURIComponent(
-          verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey
-        )}`;
+    useEffect(() => {
+        if (!PropertyDuePaymentsState) return;
+        if (PropertyDuePaymentsState.paymentIntegrationApiState === "ideal") {
+            submit();
+            // window.location = "https://gmadaipms.in/PaymentGateWay/PayNow_New.aspx?UniqueId=6ad15a5d-c5ec-44b0-bc42-5027875abae9&UserId=0&Amount=1&AuthTokenKey=ZwKYJJij3aXA5%2BAXsqHwpeeOgGoB%2FD9AzSpeZaZRWu9czRThasIkbYMROefX1MKgpqT4rBMS7tI3HZK7YD%2FEC%2Fa0GDpAq0TxVLnEZrA9G5psSLdRG%2BszRltIOR77dyI5aJggU24yJ%2Bq0QwPMDgO4g4vceTNifAYg6wb73Q8FJ10Rgzleu6trW7%2BCASJrnFht&AuthToken=xAqtZpEX9QNKhssg6XslvA%3D%3D&ArchitectToken=null&ArchitectTokenKey=null";
+            let url = `${PropertyDuePaymentsState.paymentIntegrationPayload.URL
+                }?UniqueId=${PropertyDuePaymentsState.paymentIntegrationPayload.UniqueId
+                }&UserId=${PropertyDuePaymentsState.paymentIntegrationPayload.UserId
+                }&Amount=${demandNoteData.TotalAmount}&AuthTokenKey=${encodeURIComponent(
+                    verifyUpnAndMobileSubmitOtpState.AuthTokenKey
+                )}&AuthToken=${encodeURIComponent(
+                    verifyUpnAndMobileSubmitOtpState.AuthToken
+                )}&ArchitectToken=${encodeURIComponent(
+                    verifyUpnAndMobileSubmitOtpState.ArchitectToken
+                )}&ArchitectTokenKey=${encodeURIComponent(
+                    verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey
+                )}`;
 
-        console.error(url);
-        window.location = url;
-      //handleSubmit();
-    }
-
-    if (PropertyDuePaymentsState.paymentIntegrationApiState === "error") {
-      setPayDisabled(false);
-      message.error("Failed to initiate payment");
-    }
-  }, [PropertyDuePaymentsState.paymentIntegrationApiState]);
-
-  useEffect(() => {
-    if (
-      ["Success", "Failed", "In-Progress", "Cancelled"].includes(
-        PropertyDuePaymentsState.paymentStatus
-      )
-    ) {
-      if (props.serviceId === "1796") {
-        console.log("PRODUCTION CHECK: paymentStatus before success");
-        console.error("PRODUCTION CHECK: error paymentStatus before success");
-
-        if (PropertyDuePaymentsState.paymentStatus === "Success") {
-          console.log("PRODUCTION CHECK: paymentStatus after success");
-          console.error("PRODUCTION CHECK: error paymentStatus after success");
-
-          postAutoDCR({
-            OrgId: OrgId,
-            ApplicationId: applicationId,
-            AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken ?? "",
-            AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey ?? "",
-            ArchitectToken:
-              verifyUpnAndMobileSubmitOtpState.ArchitectToken ?? "",
-            ArchitectTokenKey:
-              verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey ?? "",
-          });
-          // Call handleSubmit after postAutoDCR when payment is successful
-          console.log("PRODUCTION CHECK: paymentStatus after dcr");
-          console.error("PRODUCTION CHECK: error paymentStatus after dcr");
-
-          submit();
-
-          console.log("PRODUCTION CHECK: after dcr handle submit");
-          console.error("PRODUCTION CHECK: error after dcr handle submit");
-
-          setRedirect([
-            true,
-            "/ndc-details/" + applicationId,
-          ]);
+            console.error(url);
+            window.location = url;
+            //handleSubmit();
         }
-      }
 
-      setDisplayPaymentStatusModal(true);
-    }
-  }, [PropertyDuePaymentsState.paymentStatus]);
+        if (PropertyDuePaymentsState.paymentIntegrationApiState === "error") {
+            setPayDisabled(false);
+            message.error("Failed to initiate payment");
+        }
+    }, [PropertyDuePaymentsState.paymentIntegrationApiState]);
+
+    useEffect(() => {
+        if (
+            ["Success", "Failed", "In-Progress", "Cancelled"].includes(
+                PropertyDuePaymentsState.paymentStatus
+            )
+        ) {
+            if (props.serviceId === "1796") {
+                console.log("PRODUCTION CHECK: paymentStatus before success");
+                console.error("PRODUCTION CHECK: error paymentStatus before success");
+
+                if (PropertyDuePaymentsState.paymentStatus === "Success") {
+                    console.log("PRODUCTION CHECK: paymentStatus after success");
+                    console.error("PRODUCTION CHECK: error paymentStatus after success");
+
+                    postAutoDCR({
+                        OrgId: OrgId,
+                        ApplicationId: applicationId,
+                        AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken ?? "",
+                        AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey ?? "",
+                        ArchitectToken:
+                            verifyUpnAndMobileSubmitOtpState.ArchitectToken ?? "",
+                        ArchitectTokenKey:
+                            verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey ?? "",
+                    });
+                    // Call handleSubmit after postAutoDCR when payment is successful
+                    console.log("PRODUCTION CHECK: paymentStatus after dcr");
+                    console.error("PRODUCTION CHECK: error paymentStatus after dcr");
+
+                    submit();
+
+                    console.log("PRODUCTION CHECK: after dcr handle submit");
+                    console.error("PRODUCTION CHECK: error after dcr handle submit");
+
+                    setRedirect([
+                        true,
+                        "/ndc-details/" + applicationId,
+                    ]);
+                }
+            }
+
+            setDisplayPaymentStatusModal(true);
+        }
+    }, [PropertyDuePaymentsState.paymentStatus]);
 
     useEffect(() => {
         if (formData.SchemeId) {
@@ -1647,12 +1645,13 @@ console.error(
         }
     };
 
-    const isValidForFeesCalculation = () => {
+    const isValidForFeesCalculation = (Totalarea) => {
         const formValues = form.getFieldsValue();
         const area = Number(formValues.Area);
         const unit = formValues.UnitOfArea;
+        const applicationType = formValues.ApplicationType;
 
-           const unitOfArea =
+        const unitOfArea =
             typeof unit === "string"
                 ? unit.trim() === "" ? null : unit
                 : Number.isInteger(unit)
@@ -1661,19 +1660,33 @@ console.error(
                         ?.Name ?? null
                     : null;
 
-        if (!area || area <= 0) {
+        // Check if ApplicationType is empty or not selected
+        if (!applicationType) {
             return {
                 isValid: false,
-                message: "Property area must be greater than 0. Please update property details."
+                message: "Application Type is required. Please select one."
             };
         }
+        // Check for "Purposed" application type and ensure Totalarea > 0
+        if (applicationType === "Purposed" && Totalarea <= 0) {
+            return {
+                isValid: false,
+                message: "Total area must be greater than 0 for Purposed application type. Please update property details."
+            };
+        }
+        // if (!area || area <= 0) {
+        //     return {
+        //         isValid: false,
+        //         message: "Property area must be greater than 0. Please update property details."
+        //     };
+        // }
 
-        if (!unitOfArea || unitOfArea.trim() === "") {
-            return {
-                isValid: false,
-                message: "Unit of Area is required"
-            };
-        }
+        // if (!unitOfArea || unitOfArea.trim() === "") {
+        //     return {
+        //         isValid: false,
+        //         message: "Unit of Area is required"
+        //     };
+        // }
 
         return { isValid: true };
     }
@@ -1770,7 +1783,7 @@ console.error(
                                     rules={[{
                                         required: true,
                                         message: 'Required'
-                                    }]}          
+                                    }]}
                                 >
                                     <Input readOnly={basedOnProperty} disabled={true} size="large" name="Area" onChange={handleOnChange} />
                                 </FormItem>
@@ -1843,6 +1856,12 @@ console.error(
                                         <FormItem
                                             label="Total Construction Cost"
                                             name="TotalConstructionCost"
+                                            rules={[
+                                                {
+                                                    pattern: /^[0-9]*\.?[0-9]*$/,
+                                                    message: "Only numbers and decimal are allowed",
+                                                },
+                                            ]}
                                         >
                                             <Input size="large" />
                                         </FormItem>
@@ -1856,6 +1875,12 @@ console.error(
                                                     <FormItem
                                                         label="Paid Security Amount"
                                                         name="PaidSecurityAmount"
+                                                        rules={[
+                                                {
+                                                    pattern: /^[0-9]*\.?[0-9]*$/,
+                                                    message: "Only numbers and decimal are allowed",
+                                                },
+                                            ]}
                                                     >
                                                         <Input size="large" />
                                                     </FormItem>
@@ -1864,6 +1889,12 @@ console.error(
                                                     <FormItem
                                                         label="Total Existing area (In sqmts)"
                                                         name="TotalExistingArea"
+                                                        rules={[
+                                                {
+                                                    pattern: /^[0-9]*\.?[0-9]*$/,
+                                                    message: "Only numbers and decimal are allowed",
+                                                },
+                                            ]}
                                                     >
                                                         <Input
                                                             size="large"
@@ -1877,6 +1908,12 @@ console.error(
                                                     <FormItem
                                                         label={`Existing Area Scrutiny Amount: ${existingAreaScrutinyAmount}`}
                                                         name="TotalArea"
+                                                        rules={[
+                                                {
+                                                    pattern: /^[0-9]*\.?[0-9]*$/,
+                                                    message: "Only numbers and decimal are allowed",
+                                                },
+                                            ]}
                                                     ></FormItem>
                                                 </Col>
                                             </Row>
@@ -2423,13 +2460,14 @@ console.error(
                                                         {(item.IsPVerificationRequired || item.SampleFileURL) &&
                                                             <Space>
                                                                 {item.SampleFileURL ? <Link to={{ pathname: item.SampleFileURL }} target="_blank" style={{ textDecoration: 'underline', color: '#006fc3' }}>Download Sample Document.</Link> : null}
-                                                                {item.IsPVerificationRequired && props.serviceId !== 1796 &&
+                                                                {item.IsPVerificationRequired && props.serviceId !== "1796" && props.serviceId !== "1796" &&
                                                                     <Alert
                                                                         message="Physical verification required."
                                                                         type="warning"
                                                                         style={{ padding: "0px 8px" }}
                                                                     />
                                                                 }
+
                                                             </Space>
                                                         }
                                                     </div>
