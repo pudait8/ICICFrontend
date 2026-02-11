@@ -21,13 +21,14 @@ import conf from '../../config'
 import { saveWorkFlow, saveWorkFlowrRsetState } from '../../actions/saveWorkFlowAction'
 import { Heading } from "../NdcDetails/NdcDetailsStyle"
 import { postAutoDCR, postAutoDCRResetState } from '../../actions/postAutoDCRAction'
+import { getApplicationDetail } from "../../actions/getApplicationDetailAction"
 
 
 const ApplicationProgress = props => {
 
     const { getApplicationProgress, getApplicationProgressState,
         getPaymentIntegrationPayload, PropertyDuePaymentsState, paymentIntegrationStatusCheck, saveWorkFlow, saveWorkFlowState, saveWorkFlowrRsetState, verifyUpnAndMobileSubmitOtpState,
-        postAutoDCR, postAutoDCRState, postAutoDCRResetState, ApplicationTypeId
+        postAutoDCR, postAutoDCRState, postAutoDCRResetState, ApplicationTypeId,getApplicationDetail,getApplicationDetailState
     } = props
 
 
@@ -94,7 +95,17 @@ const ApplicationProgress = props => {
             ArchitectTokenKey: verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey ?? ""
         })
     }, [])
-
+    
+   useEffect(() => {
+          getApplicationDetail({
+              ApplicationId: parseInt(props.ApplicationId),
+              OrgId: getOrgId(),
+              AuthToken: verifyUpnAndMobileSubmitOtpState.AuthToken ?? "",
+              AuthTokenKey: verifyUpnAndMobileSubmitOtpState.AuthTokenKey ?? "",
+              ArchitectToken: verifyUpnAndMobileSubmitOtpState.ArchitectToken ?? "",
+              ArchitectTokenKey: verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey ?? ""
+          })
+     }, [])
     useEffect(() => {
         if (ApplicationTypeId !== 1727 && ApplicationTypeId !== 1710) {
             if (getApplicationProgressState.uiState === "ideal") {
@@ -376,7 +387,8 @@ const ApplicationProgress = props => {
                                                                                     icon={<SendIcon size={12} />}
                                                                                     loading={["loading", "ideal"].includes(PropertyDuePaymentsState.paymentIntegrationApiState) ? true : false}
                                                                                     onClick={() => getPaymentIntegrationPayload({
-                                                                                        PropertyRefId: action.CustomPayload[0].PropertyRefId,
+                                                                                        
+                                                                                        PropertyRefId: ApplicationTypeId == 1796 ? getApplicationDetailState?.data?.PropertyRefId || action.CustomPayload[0].PropertyRefId: action.CustomPayload[0].PropertyRefId,
                                                                                         OrgId: action.CustomPayload[0].OrgId,
                                                                                         TotalDueAmount: action.CustomPayload[0]?.TotalDueAmount,
                                                                                         headDetails: action.CustomPayload[0].headDetails,
@@ -619,6 +631,7 @@ const mapStateToProps = (state) => ({
     saveWorkFlowState: state.saveWorkFlow,
     verifyUpnAndMobileSubmitOtpState: state.verifyUpnAndMobileSubmitOtp,
     postAutoDCRState: state.postAutoDCR,
+    getApplicationDetailState:state.getApplicationDetail
 
 })
 
@@ -630,6 +643,7 @@ const mapDispatchToProps = (dispatch) => ({
     saveWorkFlowrRsetState: () => dispatch(saveWorkFlowrRsetState()),
     postAutoDCR: (params) => dispatch(postAutoDCR(params)),
     postAutoDCRResetState: () => dispatch(postAutoDCRResetState()),
+    getApplicationDetail: (params) => dispatch(getApplicationDetail(params))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ApplicationProgress)
