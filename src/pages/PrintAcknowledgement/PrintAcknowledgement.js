@@ -299,7 +299,8 @@ const BPPrintLayout = ({ data }) => {
             </div>
 
             <div style={styles.subHeader}>
-                Acknowledgement Receipt under Self-Certification Scheme
+                {/* Acknowledgement Receipt under Self-Certification Scheme */}
+                Auto sanction cum Acknowledgement slip
             </div>
 
             {/* APPLICATION INFO */}
@@ -375,6 +376,19 @@ const BPPrintLayout = ({ data }) => {
                 </tbody>
             </table>
 
+             {/* Architect DETAILS */}
+            <table style={styles.table}>
+                <tbody>
+                    <tr>
+                        <td colSpan={4} style={styles.section}>Architect Details -</td>
+                    </tr>
+                    <tr>
+                        <td style={styles.td}>Architect Name :  </td>
+                        <td style={styles.td} colSpan={3}>Certificate No. : </td>
+                    </tr>
+                </tbody>
+            </table>
+
             {/* COMMUNICATION */}
             <table style={styles.table}>
                 <tbody>
@@ -422,7 +436,8 @@ const BPPrintLayout = ({ data }) => {
             <div style={styles.note}>
                 Note: <br />
                 1. All the required documents as mentioned in the checklist are duly filled and attested by the applicant.<br />
-                2. This is computer generated automatic receipt vide application No. {data.ApplicationNo}. NO Signature Is Required.
+                2. This is computer generated automatic receipt vide application No. {data.ApplicationNo}. NO Signature Is Required.<br />
+                3.In reference to subject cited above, the documents have been received and are being kept in this office for record with understanding that these plans have been prepared as per the terms and conditions of allotment letter, zoning plan and have also been prepared within the framework of provisions of applicable building rules.
             </div>
 
         </div>

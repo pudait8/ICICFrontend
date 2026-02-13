@@ -102,7 +102,9 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         Mobile: '',
         AppointmentDate: '',
         UnitOfArea: '',
-        Area: ''
+        Area: '',
+        ArchitectName: '',
+        CertificateNo: ''
     });
     const [isPVerificationRequired, setIsPVerificationRequired] = useState(false);
 
@@ -301,9 +303,9 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     //         )
     //     ) {
     //         if (props.serviceId === "1796") {
-    //             // For service ID 1625, handle payment success
+    //             // For service ID 1796, handle payment success
     //             if (PropertyDuePaymentsState.paymentStatus === "Success") {
-    //                 // You can add postAutoDCR call here if needed for service 1625
+    //                 // You can add postAutoDCR call here if needed for service 1796
     //                 // For now, just show success modal
     //             }
     //         }
@@ -527,6 +529,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     }, [saveNdcApplicationState]);
 
     const submit = () => {
+        
         if (saveOwnerPrivatePropertiesState.apiState === 'success') {
             if (props.serviceId === "1796") {
                 saveNdcApplication({
@@ -1091,6 +1094,10 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                 message.error("Atleast one owner must be added");
                 return;
             }
+            const extraDetails = {
+            architectName: formData.ArchitectName || "",
+            certificateNo: formData.CertificateNo || ""
+        };
             const getDataResponse = await fetch(
                 `${conf.api.base_url}Gateway_PostAuthPortalService/GetData`,
                 {
@@ -1201,7 +1208,8 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                         SubUsageType: formValues.ApplicationType || "Proposed",
                         PaidSecurityAmount: Number(formValues.PaidSecurityAmount || 0),
                         ExistingAreaScrutinyFee: existingAreaScrutinyAmount,
-                        SecurityFees: totalSecurityFees
+                        SecurityFees: totalSecurityFees,
+                        ExtraDetails: JSON.stringify(extraDetails),
                     },
                     builtUpAreaList: props.serviceId === "1796" ? builtUpAreaList.map((item) => ({
                         Floor: item.floor,
@@ -1818,6 +1826,36 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                 </FormItem>
                             </Col>
                         </Row>
+
+                        <Heading>Architect Details</Heading>
+                        <Row gutter="24">
+                            <Col span="8">
+                                <FormItem
+                                    label="Architect Name"
+                                    name="ArchitectName"
+                                    rules={[{
+                                        required: true,
+                                        message: 'Required'
+                                    }]}
+                                >
+                                    <Input name="ArchitectName" maxLength={100} onChange={handleOnChange} size="large" />
+                                </FormItem>
+                            </Col>
+                            <Col span="8">
+                                <FormItem
+                                    label="Certificate No"
+                                    name="CertificateNo"
+                                    onChange={handleOnChange}
+                                    rules={[{
+                                        required: true,
+                                        message: 'Required'
+                                    }]}
+                                >
+                                    <Input name="CertificateNo" maxLength={50} size="large" />
+                                </FormItem>
+                            </Col>
+                        </Row>
+
                         <Heading>Owner Details</Heading>
                         <OwnerForm
                             serviceId={props.serviceId}

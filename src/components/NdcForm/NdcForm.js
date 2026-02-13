@@ -2053,7 +2053,6 @@ console.error(
   };
 
   const handleBuiltUpArea = async ({ area }) => {
-    debugger;
     // Validation: All fields are required
     // if (!floor) {
     //   message.error("Please select a floor");
@@ -2438,6 +2437,35 @@ console.error(
               </FormItem>
             </Col>
           </Row>
+          <BlankSpace/>
+
+<Heading>Architect Details</Heading>
+                        <Row gutter="24">
+                            <Col span="8">
+                                <FormItem
+                                    label="Architect Name"
+                                    name="ArchitectName"
+                                    rules={[{
+                                        required: true,
+                                        message: 'Required'
+                                    }]}
+                                >
+                                    <Input name="ArchitectName" maxLength={100} size="large" />
+                                </FormItem>
+                            </Col>
+                            <Col span="8">
+                                <FormItem
+                                    label="Certificate No"
+                                    name="ArchitectCertificateNo"
+                                    rules={[{
+                                        required: true,
+                                        message: 'Required'
+                                    }]}
+                                >
+                                    <Input name="ArchitectCertificateNo" maxLength={50} size="large" />
+                                </FormItem>
+                            </Col>
+                        </Row>
 
           <Heading>Property Details</Heading>
           <Row gutter="24">
