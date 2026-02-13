@@ -1827,34 +1827,38 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                             </Col>
                         </Row>
 
-                        <Heading>Architect Details</Heading>
-                        <Row gutter="24">
-                            <Col span="8">
-                                <FormItem
-                                    label="Architect Name"
-                                    name="ArchitectName"
-                                    rules={[{
-                                        required: true,
-                                        message: 'Required'
-                                    }]}
-                                >
-                                    <Input name="ArchitectName" maxLength={100} onChange={handleOnChange} size="large" />
-                                </FormItem>
-                            </Col>
-                            <Col span="8">
-                                <FormItem
-                                    label="Certificate No"
-                                    name="CertificateNo"
-                                    onChange={handleOnChange}
-                                    rules={[{
-                                        required: true,
-                                        message: 'Required'
-                                    }]}
-                                >
-                                    <Input name="CertificateNo" maxLength={50} size="large" />
-                                </FormItem>
-                            </Col>
-                        </Row>
+                        {props.serviceId === "1796" && (
+                            <>
+                                <Heading>Architect Details</Heading>
+                                <Row gutter="24">
+                                    <Col span="8">
+                                        <FormItem
+                                            label="Architect Name"
+                                            name="ArchitectName"
+                                            rules={[{
+                                                required: true,
+                                                message: 'Required'
+                                            }]}
+                                        >
+                                            <Input name="ArchitectName" maxLength={100} onChange={handleOnChange} size="large" />
+                                        </FormItem>
+                                    </Col>
+                                    <Col span="8">
+                                        <FormItem
+                                            label="Certificate No"
+                                            name="CertificateNo"
+                                            onChange={handleOnChange}
+                                            rules={[{
+                                                required: true,
+                                                message: 'Required'
+                                            }]}
+                                        >
+                                            <Input name="CertificateNo" maxLength={50} size="large" />
+                                        </FormItem>
+                                    </Col>
+                                </Row>
+                            </>
+                        )}
 
                         <Heading>Owner Details</Heading>
                         <OwnerForm
