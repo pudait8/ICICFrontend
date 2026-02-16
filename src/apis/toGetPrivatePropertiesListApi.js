@@ -7,9 +7,9 @@ export const toGetPrivatePropertiesListApi = async (params) => {
         url: `${conf.api.base_url}Gateway_AuthService/ViewDetail`,
         data: {
             "ApiKey": "GetPrivatePropertiesList",
-            "OrgId": 3,
+            "OrgId": params?.OrgId || 3,
             "ApiParams": {
-                "SchemeId": params
+                "SchemeId": params?.SchemeId || params
             }
         },
         headers: {

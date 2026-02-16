@@ -1545,7 +1545,12 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     useEffect(() => {
         if (formData.SchemeId) {
             form.setFieldsValue({ "PropertyNumber": "", "Area": "", "UnitOfArea": "" })
-            toGetPrivatePropertiesList(formData.SchemeId);
+            toGetPrivatePropertiesList(
+                {
+                    "SchemeId":formData.SchemeId,
+                    "OrgId":OrgId
+                }
+                );
         }
     }, [formData.SchemeId]);
 
@@ -1793,7 +1798,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                         message: 'Required'
                                     }]}
                                 >
-                                    <Input readOnly={basedOnProperty} disabled={true} size="large" name="Area" onChange={handleOnChange} />
+                                    <Input readOnly={basedOnProperty} disabled={props.IsRenewal === "Y"} size="large" name="Area" onChange={handleOnChange} />
                                 </FormItem>
                             </Col>
                         </Row>
@@ -1815,7 +1820,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                         }
                                         name="UnitOfArea"
-                                        disabled={true}
+                                        disabled={props.IsRenewal === "Y" || basedOnProperty}
                                         onSelect={(v) => handleOnChangeSelect("UnitOfArea", v)}
                                         size="large"
                                     >
@@ -1892,7 +1897,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                     </Col>
                                 </Row>
 
-                                <Heading>Details of Boundary Wall</Heading>
+                                <Heading>Site, Area and Cost Details</Heading>
                                 <Row gutter={24} align="middle">
                                     <Col span="6">
                                         <FormItem

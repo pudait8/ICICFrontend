@@ -300,7 +300,7 @@ const BPPrintLayout = ({ data }) => {
 
             <div style={styles.subHeader}>
                 {/* Acknowledgement Receipt under Self-Certification Scheme */}
-                Auto sanction cum Acknowledgement slip
+                Auto Sanction-Cum-Acknowledgement Slip
             </div>
 
             {/* APPLICATION INFO */}
@@ -355,7 +355,7 @@ const BPPrintLayout = ({ data }) => {
                     <tr>
                         <td style={styles.td}>LOI Date :</td>
                         <td style={styles.td}>{data.PropertyDetails?.LOIDate}</td>
-                        <td style={styles.td}>Total Cost :</td>
+                        <td style={styles.td}>Total Fee Paid :</td>
                         <td style={styles.td}>{data.BuildingApplicationDetails?.TotalAmount ?? 0}</td>
                         <td />
                         <td />
