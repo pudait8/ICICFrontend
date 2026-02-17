@@ -28,7 +28,6 @@ const PrintAcknowledgement = props => {
             setTimeout(function () {
                 window.print()
             }, 500);
-
         }
 
     }, [getApplicationDetailState.uiState])
@@ -231,6 +230,18 @@ const DefaultAcknowledgement = (props) => {
 
 const BPPrintLayout = ({ data }) => {
 
+    const architectExtraDetails = React.useMemo(() => {
+        if (!data.BuildingApplicationDetails?.ExtraDetails) return null;
+
+        try {
+            const d = JSON.parse(data.BuildingApplicationDetails.ExtraDetails);
+            return d.architectName || d.certificateNo ? d : null;
+        } catch {
+            return null;
+        }
+    }, [data.BuildingApplicationDetails?.ExtraDetails]);
+
+
     const styles = {
         page: {
             width: "800px",
@@ -376,18 +387,31 @@ const BPPrintLayout = ({ data }) => {
                 </tbody>
             </table>
 
-             {/* Architect DETAILS */}
-            <table style={styles.table}>
-                <tbody>
-                    <tr>
-                        <td colSpan={4} style={styles.section}>Architect Details -</td>
-                    </tr>
-                    <tr>
-                        <td style={styles.td}>Architect Name :  </td>
-                        <td style={styles.td} colSpan={3}>Certificate No. : </td>
-                    </tr>
-                </tbody>
-            </table>
+            {/* Architect DETAILS */}
+            {/* Architect DETAILS */}
+            {(
+                (data?.ApplicationTypeId === 1791 ||
+                    data?.ApplicationTypeId === 1796) &&
+                architectExtraDetails
+            ) && (
+                    <table style={styles.table}>
+                        <tbody>
+                            <tr>
+                                <td colSpan={4} style={styles.section}>
+                                    Architect Details -
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style={styles.td}>
+                                    Architect Name : {architectExtraDetails.architectName ?? "N/A"}
+                                </td>
+                                <td style={styles.td} colSpan={3}>
+                                    Certificate No. : {architectExtraDetails.certificateNo ?? "N/A"}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                )}
 
             {/* COMMUNICATION */}
             <table style={styles.table}>
