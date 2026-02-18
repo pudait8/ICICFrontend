@@ -2437,9 +2437,11 @@ console.error(
               </FormItem>
             </Col>
           </Row>
-          <BlankSpace/>
+          <BlankSpace/>  
 
-<Heading>Architect Details</Heading>
+                      {serviceId==="1791" && (
+                      <>
+                        <Heading>Architect Details</Heading>
                         <Row gutter="24">
                             <Col span="8">
                                 <FormItem
@@ -2466,6 +2468,8 @@ console.error(
                                 </FormItem>
                             </Col>
                         </Row>
+                        </>
+                      )}
 
           <Heading>Property Details</Heading>
           <Row gutter="24">
