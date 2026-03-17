@@ -2683,7 +2683,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                             )}
                         </Modal>
 
-                        {(getAppointmentDateState.apiState === "success" && isPVerificationRequired) &&
+                        {(getAppointmentDateState.apiState === "success" && isPVerificationRequired && props.serviceId !== "1796") &&
                             <>
                                 <Heading style={{ marginTop: 36 }}>Appointment Detail For Physical Verification of Documents</Heading>
                                 <Row>
