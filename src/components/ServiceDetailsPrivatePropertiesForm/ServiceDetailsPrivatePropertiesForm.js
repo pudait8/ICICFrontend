@@ -145,6 +145,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     const [farEditIndex, setFarEditIndex] = useState(null);
     const [farDropdownData, setFarDropdownData] = useState([]);
     const [paymentOnly, setPaymentOnly] = useState(false);
+    const [basementType, setBasementType] = useState("NA");
 
 
     const [agcForm, setAgcForm] = useState({
@@ -172,12 +173,20 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         { label: "Superseded", value: "Superseded" },
     ];
 
+      const basementTypeOptions = [
+    { label: "NA", value: "NA" },    
+    { label: "Basement", value: "Basement" },
+    { label: "Stilt", value: "Stilt" },
+  ];
+
     const floorOptions = [
+        { label: "Stilt", value: -100 },
         { label: "Basement", value: -1 },
         { label: "Ground Floor", value: 0 },
         { label: "First Floor", value: 1 },
         { label: "Second Floor", value: 2 },
-        { label: "Mumty", value: 3 },
+        { label: "Third Floor", value: 3 },
+        { label: "Fourth Floor", value: 4 },
     ];
 
     const thStyle = {
@@ -650,20 +659,37 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         //   return;
         // }
 
+        const formValues = form.getFieldsValue(true);
+
         let res = isValidForFeesCalculation(area);
         if (!res.isValid) {
             message.error(res.message);
             return;
         }
 
-        const floor = hasBasement
+        let floor = (formValues.BasementType == 'Stilt' || formValues.BasementType == 'Basement')
             ? builtUpAreaList.length - 1
             : builtUpAreaList.length;
 
         // Check if max floors reached (3 floors + ground floor = 4 total, basement is separate)
         // Only check when adding new floor, not when editing
         if (editingIndex === null) {
-            // If trying to add a non-basement floor and max is reached
+          if(formValues.BasementType == 'Stilt'){
+            if (floor == -1) {
+            floor = -100;
+            }
+  // If trying to add a non-basement floor and max is reached
+            if (floor >= 0 && getNonBasementFloorCount() >= 5) {
+                message.error("Cannot add more than 4 floors");
+                return;
+            }
+            // If trying to add floor beyond Third Floor (value > 3)
+            if (floor > 4) {
+                message.error("Cannot add more than 4 floors");
+                return;
+            }
+          }else{
+  // If trying to add a non-basement floor and max is reached
             if (floor >= 0 && getNonBasementFloorCount() >= 4) {
                 message.error("Cannot add more than 3 floors (mumty room)");
                 return;
@@ -673,6 +699,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                 message.error("Cannot add more than 3 floors (mumty room)");
                 return;
             }
+          }
         }
 
         if (applicationType !== "Revised" && applicationType !== "Superseded" && (!area || area === "")) {
@@ -729,6 +756,9 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                 { floor, area, scrutinyFee, securityFee, labourCessFee, gst },
             ]);
             let floorName = floorOptions.find(x => x.value == floor)?.label;
+            if(floor == 3 && formValues.BasementType != 'Stilt'){
+                floorName = "Mumty";
+            }
             message.success(`Added data for ${floorName}`);
         }
 
@@ -1680,6 +1710,14 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                 message: "Application Type is required. Please select one."
             };
         }
+
+    if (!formValues.BasementType) {
+            return {
+                isValid: false,
+                message: "Basement Type is required. Please select one."
+            };
+        }
+
         // Check for "Purposed" application type and ensure Totalarea > 0
         if (applicationType === "Purposed" && Totalarea <= 0) {
             return {
@@ -1971,20 +2009,24 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                 <>
                                     {props.serviceId === "1796" && (
                                         <>
-                                            {builtUpAreaList.length == 0 && (
-                                                <Row gutter="24">
-                                                    <Col span="24">
-                                                        <FormItem>
-                                                            <Checkbox
-                                                                checked={hasBasement}
-                                                                onChange={() => setHasBasement(!hasBasement)}
-                                                            >
-                                                                Has Basement
-                                                            </Checkbox>
-                                                        </FormItem>
-                                                    </Col>
-                                                </Row>
-                                            )}
+                                               <Row style={{ marginBottom: "20px" }}>
+                                                          <Col span="8">
+                                                            <Form.Item label="Basement Type" name="BasementType" initialValue="NA">
+                                                              <Select
+                                                                placeholder="Select basement type"
+                                                                style={{ width: "100%" }}
+                                                                onChange={(value) => setBasementType(value)}
+                                                                disabled={builtUpAreaList.length > 0}
+                                                              >
+                                                                {basementTypeOptions.map((option) => (
+                                                                  <Select.Option key={option.value} value={option.value}>
+                                                                    {option.label}
+                                                                  </Select.Option>
+                                                                ))}
+                                                              </Select>
+                                                            </Form.Item>
+                                                          </Col>
+                                                        </Row>
                                             <Row gutter={24} align="middle">
                                                 <Col span={6}>
                                                     <Form.Item label="Area (In sqmts)">
@@ -2039,7 +2081,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                                                         padding: "8px",
                                                                     }}
                                                                 >
-                                                                    {
+                                                                    {(item.floor == 3 && form.getFieldsValue(true)?.BasementType != "Stilt") ? "Mumty":
                                                                         floorOptions.find(
                                                                             (x) => x.value == item.floor
                                                                         ).label
@@ -2720,7 +2762,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                 </BlueButton> */}
 
                                 <BlueButton
-                                    disabled={payDisabled}
+                                    disabled={payDisabled || basementType == 'Stilt'}
                                     loading={
                                         saveChangeOfOwnershipApplicationState?.apiState === "loading"
                                     }
@@ -2728,6 +2770,13 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                 >
                                     SUBMIT & PAY NOW
                                 </BlueButton>
+
+                               {basementType == 'Stilt' && <div>
+                                                        <span style={{ color: "orange" }}>
+                                                        The basement type “Stilt” is currently in the testing phase.
+                                                        </span>
+                                                    </div>
+}
 
                                 {/* <BlueButton
                 disabled={acknowledgeDisabled}
