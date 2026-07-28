@@ -386,9 +386,14 @@ const ApplicationProgress = props => {
                                                                                 <FlexDiv><BlueButton
                                                                                     icon={<SendIcon size={12} />}
                                                                                     loading={["loading", "ideal"].includes(PropertyDuePaymentsState.paymentIntegrationApiState) ? true : false}
-                                                                                    onClick={() => getPaymentIntegrationPayload({
+                                                                                    disabled={ApplicationTypeId == 1796 && !(getApplicationDetailState?.data?.PropertyRefId > 0)}
+                                                                                    onClick={() => {
+                                                                                        if (ApplicationTypeId == 1796 && !(getApplicationDetailState?.data?.PropertyRefId > 0)) return
+                                                                                        getPaymentIntegrationPayload({
                                                                                         
-                                                                                        PropertyRefId: ApplicationTypeId == 1796 ? getApplicationDetailState?.data?.PropertyRefId || action.CustomPayload[0].PropertyRefId: action.CustomPayload[0].PropertyRefId,
+                                                                                        PropertyRefId: ApplicationTypeId == 1796
+                                                                                            ? getApplicationDetailState?.data?.PropertyRefId
+                                                                                            : (action?.CustomPayload?.[0]?.PropertyRefId ?? 0),
                                                                                         OrgId: action.CustomPayload[0].OrgId,
                                                                                         TotalDueAmount: action.CustomPayload[0]?.TotalDueAmount,
                                                                                         headDetails: action.CustomPayload[0].headDetails,
@@ -399,7 +404,7 @@ const ApplicationProgress = props => {
                                                                                         ArchitectToken: verifyUpnAndMobileSubmitOtpState.ArchitectToken ?? "",
                                                                                         ArchitectTokenKey: verifyUpnAndMobileSubmitOtpState.ArchitectTokenKey ?? ""
                                                                                     })
-                                                                                    }>{`PAY NOW`}</BlueButton></FlexDiv>}
+                                                                                    }}>{`PAY NOW`}</BlueButton></FlexDiv>}
                                                                         </Footer>
                                                                     </Modal>
                                                                 </>

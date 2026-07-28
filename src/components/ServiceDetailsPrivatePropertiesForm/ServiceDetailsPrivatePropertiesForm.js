@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, use } from "react"
-import { Col, Form, Row, Upload, Button, notification, Input, DatePicker, Select, Checkbox, InputNumber, Alert, Space, Modal, message } from "antd"
+import { Col, Form, Row, Upload, Button, notification, Input, DatePicker, Select, Checkbox, InputNumber, Alert, Space, Modal, message, Radio } from "antd"
 import { connect } from "react-redux"
 import { UploadOutlined } from '@ant-design/icons'
 import _ from "lodash"
@@ -146,6 +146,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
     const [farDropdownData, setFarDropdownData] = useState([]);
     const [paymentOnly, setPaymentOnly] = useState(false);
     const [basementType, setBasementType] = useState("NA");
+    const [stiltLevelType, setStiltLevelType] = useState("S+3");
 
 
     const [agcForm, setAgcForm] = useState({
@@ -187,6 +188,22 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
         { label: "Second Floor", value: 2 },
         { label: "Third Floor", value: 3 },
         { label: "Fourth Floor", value: 4 },
+        { label: "Mumty", value: 100 },
+    ];
+    const stiltFloorOptionsS3 = [
+        { label: "Stilt", value: -100 },
+        { label: "First Floor", value: 1 },
+        { label: "Second Floor", value: 2 },
+        { label: "Third Floor", value: 3 },
+        { label: "Mumty", value: 100 },
+    ];
+    const stiltFloorOptionsS4 = [
+        { label: "Stilt", value: -100 },
+        { label: "First Floor", value: 1 },
+        { label: "Second Floor", value: 2 },
+        { label: "Third Floor", value: 3 },
+        { label: "Fourth Floor", value: 4 },
+        { label: "Mumty", value: 100 },
     ];
 
     const thStyle = {
@@ -667,39 +684,32 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
             return;
         }
 
-        let floor = (formValues.BasementType == 'Stilt' || formValues.BasementType == 'Basement')
-            ? builtUpAreaList.length - 1
-            : builtUpAreaList.length;
+        const selectedFloorOptions = formValues.BasementType == "Stilt"
+            ? (stiltLevelType === "S+4" ? stiltFloorOptionsS4 : stiltFloorOptionsS3)
+            : floorOptions;
+        let floor = (formValues.BasementType == 'Stilt')
+            ? selectedFloorOptions[builtUpAreaList.length]?.value
+            : ((formValues.BasementType == 'Basement') ? builtUpAreaList.length - 1 : builtUpAreaList.length);
 
         // Check if max floors reached (3 floors + ground floor = 4 total, basement is separate)
         // Only check when adding new floor, not when editing
         if (editingIndex === null) {
           if(formValues.BasementType == 'Stilt'){
-            if (floor == -1) {
-            floor = -100;
-            }
-  // If trying to add a non-basement floor and max is reached
-            if (floor >= 0 && getNonBasementFloorCount() >= 5) {
-                message.error("Cannot add more than 4 floors");
-                return;
-            }
-            // If trying to add floor beyond Third Floor (value > 3)
-            if (floor > 4) {
-                message.error("Cannot add more than 4 floors");
+            const maxAllowedFloor = stiltLevelType === "S+4" ? 4 : 3;
+            if (floor === undefined) {
+                message.error(`Cannot add more than ${maxAllowedFloor} floors`);
                 return;
             }
           }else{
-  // If trying to add a non-basement floor and max is reached
-            if (floor >= 0 && getNonBasementFloorCount() >= 4) {
-                message.error("Cannot add more than 3 floors (mumty room)");
-                return;
-            }
-            // If trying to add floor beyond Third Floor (value > 3)
             if (floor > 3) {
                 message.error("Cannot add more than 3 floors (mumty room)");
                 return;
             }
           }
+        }
+
+        if (floor == 3 && formValues.BasementType != 'Stilt') {
+            floor = 100;
         }
 
         if (applicationType !== "Revised" && applicationType !== "Superseded" && (!area || area === "")) {
@@ -755,10 +765,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                 ...builtUpAreaList,
                 { floor, area, scrutinyFee, securityFee, labourCessFee, gst },
             ]);
-            let floorName = floorOptions.find(x => x.value == floor)?.label;
-            if(floor == 3 && formValues.BasementType != 'Stilt'){
-                floorName = "Mumty";
-            }
+            let floorName = selectedFloorOptions.find(x => x.value == floor)?.label;
             message.success(`Added data for ${floorName}`);
         }
 
@@ -1144,8 +1151,9 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                         ApiParams: {
                             // ApplicationId:
                             //   verifyUpnAndMobileSubmitOtpState.data.ApplicationId,
-                            ApplicationId: applicationId,  //hard code
+                            ApplicationId: applicationId,
                             ApplicationType: props.serviceId,
+                            SubmitType: 0,
                             EmailId: "",
                             Remark: formData.Remark,
                             TemporaryApplicationId: getDocumentListState.EntityId ?? 0,
@@ -1371,6 +1379,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                 ).toFixed(2)
             );
 
+             const formValues = form.getFieldsValue(true);
 
             setDemandNoteData({
                 TotalAmount: totalAmount,
@@ -1405,7 +1414,8 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                     },
                 ], //remove hard code
                 DemandNoteId: !paymentOnly ? 0 : verifyUpnAndMobileSubmitOtpState?.data?.ApplicationDemandNoteId,
-                EntityType: 111,
+                EntityType:  111,
+                EntityRefId: formValues?.PropertyNumber || -1,
                 PropertyRefId: verifyUpnAndMobileSubmitOtpState.data.PropertyRefId,
                 OrgId: OrgId,
                 TotalDueAmount: totalAmount,
@@ -1644,7 +1654,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
             const payload = {
                 ApplicationId: applicationId,
                 OrgId: OrgId,
-                EntityRefId: -1,
+                EntityRefId: demandNoteData.EntityRefId,
                 ScrutinyFee: demandNoteData.ScrutinyFee,
                 SecurityFee: demandNoteData.SecurityFee,
                 LabourCessFee: demandNoteData.LabourCessFee,
@@ -1836,7 +1846,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                         message: 'Required'
                                     }]}
                                 >
-                                    <Input readOnly={basedOnProperty} disabled={props.IsRenewal === "Y"} size="large" name="Area" onChange={handleOnChange} />
+                                    <Input readOnly={basedOnProperty} disabled={props.serviceId === "1796" || props.IsRenewal === "Y"} size="large" name="Area" onChange={handleOnChange} />
                                 </FormItem>
                             </Col>
                         </Row>
@@ -1858,7 +1868,7 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                         }
                                         name="UnitOfArea"
-                                        disabled={props.IsRenewal === "Y" || basedOnProperty}
+                                        disabled={props.serviceId === "1796" || props.IsRenewal === "Y" || basedOnProperty}
                                         onSelect={(v) => handleOnChangeSelect("UnitOfArea", v)}
                                         size="large"
                                     >
@@ -2015,7 +2025,12 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                                               <Select
                                                                 placeholder="Select basement type"
                                                                 style={{ width: "100%" }}
-                                                                onChange={(value) => setBasementType(value)}
+                                                                onChange={(value) => {
+                                                                    setBasementType(value);
+                                                                    if (value !== "Stilt") {
+                                                                        setStiltLevelType("S+3");
+                                                                    }
+                                                                }}
                                                                 disabled={builtUpAreaList.length > 0}
                                                               >
                                                                 {basementTypeOptions.map((option) => (
@@ -2027,6 +2042,22 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                                             </Form.Item>
                                                           </Col>
                                                         </Row>
+                                            {basementType === "Stilt" && (
+                                                <Row style={{ marginBottom: "20px" }}>
+                                                    <Col span="8">
+                                                        <Form.Item label="Stilt Level Type">
+                                                            <Radio.Group
+                                                                value={stiltLevelType}
+                                                                onChange={(e) => setStiltLevelType(e.target.value)}
+                                                                disabled={builtUpAreaList.length > 0}
+                                                            >
+                                                                <Radio value="S+3">S+3</Radio>
+                                                                <Radio value="S+4">S+4</Radio>
+                                                            </Radio.Group>
+                                                        </Form.Item>
+                                                    </Col>
+                                                </Row>
+                                            )}
                                             <Row gutter={24} align="middle">
                                                 <Col span={6}>
                                                     <Form.Item label="Area (In sqmts)">
@@ -2081,11 +2112,9 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                                                         padding: "8px",
                                                                     }}
                                                                 >
-                                                                    {(item.floor == 3 && form.getFieldsValue(true)?.BasementType != "Stilt") ? "Mumty":
-                                                                        floorOptions.find(
-                                                                            (x) => x.value == item.floor
-                                                                        ).label
-                                                                    }
+                                                                    {floorOptions.find(
+                                                                        (x) => x.value == item.floor
+                                                                    )?.label}
                                                                 </td>
                                                                 <td
                                                                     style={{
@@ -2762,7 +2791,8 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                 </BlueButton> */}
 
                                 <BlueButton
-                                    disabled={payDisabled || basementType == 'Stilt'}
+                                 disabled={payDisabled}
+                                    //disabled={payDisabled || basementType == 'Stilt'}
                                     loading={
                                         saveChangeOfOwnershipApplicationState?.apiState === "loading"
                                     }
@@ -2771,12 +2801,12 @@ export const ServiceDetailsPrivatePropertiesForm = (props) => {
                                     SUBMIT & PAY NOW
                                 </BlueButton>
 
-                               {basementType == 'Stilt' && <div>
+                               {/* {basementType == 'Stilt' && <div>
                                                         <span style={{ color: "orange" }}>
                                                         The basement type “Stilt” is currently in the testing phase.
                                                         </span>
                                                     </div>
-}
+} */}
 
                                 {/* <BlueButton
                 disabled={acknowledgeDisabled}
