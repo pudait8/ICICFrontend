@@ -28,7 +28,7 @@ const ApplicationProgress = props => {
 
     const { getApplicationProgress, getApplicationProgressState,
         getPaymentIntegrationPayload, PropertyDuePaymentsState, paymentIntegrationStatusCheck, saveWorkFlow, saveWorkFlowState, saveWorkFlowrRsetState, verifyUpnAndMobileSubmitOtpState,
-        postAutoDCR, postAutoDCRState, postAutoDCRResetState, ApplicationTypeId,getApplicationDetail,getApplicationDetailState
+        postAutoDCR, postAutoDCRState, postAutoDCRResetState, ApplicationTypeId,getApplicationDetail,getApplicationDetailState, PropertyRefId
     } = props
 
 
@@ -386,13 +386,13 @@ const ApplicationProgress = props => {
                                                                                 <FlexDiv><BlueButton
                                                                                     icon={<SendIcon size={12} />}
                                                                                     loading={["loading", "ideal"].includes(PropertyDuePaymentsState.paymentIntegrationApiState) ? true : false}
-                                                                                    disabled={ApplicationTypeId == 1796 && !(getApplicationDetailState?.data?.PropertyRefId > 0)}
+                                                                                    disabled={ApplicationTypeId == 1796 && !(PropertyRefId > 0)}
                                                                                     onClick={() => {
-                                                                                        if (ApplicationTypeId == 1796 && !(getApplicationDetailState?.data?.PropertyRefId > 0)) return
+                                                                                        if (ApplicationTypeId == 1796 && !(PropertyRefId > 0)) return
                                                                                         getPaymentIntegrationPayload({
-                                                                                        
+
                                                                                         PropertyRefId: ApplicationTypeId == 1796
-                                                                                            ? getApplicationDetailState?.data?.PropertyRefId
+                                                                                            ? PropertyRefId
                                                                                             : (action?.CustomPayload?.[0]?.PropertyRefId ?? 0),
                                                                                         OrgId: action.CustomPayload[0].OrgId,
                                                                                         TotalDueAmount: action.CustomPayload[0]?.TotalDueAmount,

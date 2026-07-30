@@ -2155,7 +2155,7 @@ const NdcDetails = props => {
                                     </>
                                 }
                                 <BlankSpace />
-                                <ApplicationProgress ApplicationId={ApplicationId} ApplicationTypeId={getNdcDetailsState.data.ApplicationTypeId} DownloadCertificateLink={getNdcDetailsState.data.DownloadCertificateLink} getNdcDetailsFunction={getNdcDetailsFunction} />
+                                <ApplicationProgress ApplicationId={ApplicationId} ApplicationTypeId={getNdcDetailsState.data.ApplicationTypeId} PropertyRefId={getNdcDetailsState.data.PropertyRefId} DownloadCertificateLink={getNdcDetailsState.data.DownloadCertificateLink} getNdcDetailsFunction={getNdcDetailsFunction} />
                             </Form>
                         </div>
                     </div>
